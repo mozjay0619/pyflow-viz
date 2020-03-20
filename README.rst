@@ -83,7 +83,7 @@ The ``view`` function actually has the ability to summarize the DAG by only show
 
 	G.view(summary=False)
 
-.. figure:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/summary_false.png
+.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/summary_false.png
 
 With the summary functionality turned off, the complete DAG visualization will includes ``DataNodes`` as well as the ``OperationNodes``. 
 
