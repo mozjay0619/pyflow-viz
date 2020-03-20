@@ -72,7 +72,7 @@ What if we have a python function with multiple outputs? Due to dynamic nature o
 	G.view()
 
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/multiout.png
-   :width: 20pt
+   :width: 17pt
 
 Visualizing data flow
 ---------------------
