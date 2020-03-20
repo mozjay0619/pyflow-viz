@@ -39,4 +39,4 @@ You can also easily visualize the DAG using ``view`` method:
 
 	G.view()
 
-.. figure:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/simple_dag.png
+.. figure:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/simpledag.png
