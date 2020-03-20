@@ -126,7 +126,7 @@ Pyflow lets the user customize the DAG visuals to a certain degree, with more to
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/queryA.png
    :width: 20pt
 
-But since at a conceptual level, queries are similarly progenitors of new data, perhaps we want to put them side by side on top. Also, since these are probably coming from some data storage, we might want to style their nodes accordingly, with different color.
+But since at a conceptual level, queries are similarly progenitors of new data, perhaps we want to put them side by side on top, and position is controlled by ``rank`` parameter. Also, since these are probably coming from some data storage, we might want to style their nodes accordingly, with different color.
 
 .. code:: python
 
@@ -199,12 +199,56 @@ Let's take the tour of this process by looking at the graph. Notice that in verb
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/verbose_.png
    :width: 10pt
 
-As tries to compute ``data_12``, it will first activate all the ``OperationNodes`` that is needed for the computation, in out case, those are ``adding_11``, ``adding_8``, ``adding_0``, ``return2_4``. It will then follow the lineage of the graph to work on intermediate results needed to proceed down the graph. Notice that as the computation proceeds, the ``OperationNodes`` that were activated are deactivated. When it gets to ``data_3``, notice that it is needed at both ``adding_8`` and ``return2_4``. Thus, once it completes ``adding_8``, it cannot yet release the memory from ``data_3``: ``data_3 still needed at return2_4``. But as soon as ``return2_4`` is ran, it releases ``data_3`` from memory, as it is not needed anymore: ``data_3 released!``. The ``DataNodes`` with raw inputs such as integers are not released since there is no way for the graph to reconstruct them. 
+As pyflow tries to compute ``data_12``, it will first activate all the ``OperationNodes`` that is needed for the computation, in out case, those are ``adding_11``, ``adding_8``, ``adding_0``, ``return2_4``. It will then follow the lineage of the graph to work on intermediate results needed to proceed down the graph. Notice that as the computation proceeds, the ``OperationNodes`` that were activated are deactivated. When it gets to ``data_3``, notice that it is needed at both ``adding_8`` and ``return2_4``. Thus, once it completes ``adding_8``, it cannot yet release the memory from ``data_3``: ``data_3 still needed at return2_4``. But as soon as ``return2_4`` is ran, it releases ``data_3`` from memory, as it is not needed anymore: ``data_3 released!``. The ``DataNodes`` with raw inputs such as integers are not released since there is no way for the graph to reconstruct them. 
 
+By the same token, if you were to run the graph from middle, say, at ``a4``:
 
+.. code:: python
 
+	a4.get()
 
+You will see:
 
+::
+
+	computing for data_10
+	adding_8 activated!
+	adding_0 activated!
+	computing for data_3
+	running adding_0
+	adding_0 deactivated!
+	running adding_8
+	data_3 released!
+	adding_8 deactivated!
+
+In this case, since ``return2_4`` is not activated, the ``data_3`` does not consider its presence in deciding release of memory. 
+
+Lastly, you have the option of either persisting all of the intermediate results, or persisting part of the intermediate results.
+
+To persist all intermediate results, use ``persist`` parameter at ``GraphBuilder`` level:
+
+.. code:: python
+
+	from pyflow import GraphBuilder
+
+	G = GraphBuilder(persist=True)
+
+With persist enabled, once you run ``a5.get()``, when you try to run ``a4.get()``, the graph will not recompute anything because ``a4`` node result will have been cached in memory. The persist is turned off by default, as it is assumed that the user of the pyflow will process large amounts of data. 
+
+To persist parts of the data, you can specify the ``persist`` parameter at ``add`` level:
+
+.. code:: python
+	
+	G = GraphBuilder(persist=False)  # default value
+
+	a1 = G.add(adding)(1, 2)
+	a2, a3 = G.add(return2, n_out=2)(a1, 3)
+	a4 = G.add(adding, persist=True)(a1, 5)  # persist here
+	a5 = G.add(adding)(a4, a3)
+	
+	a5.get()
+
+Then, when you run ``a4.get()`` it will not rerun the computation as ``a4`` result has been cached in memory although all other intermediate results will have been released.  
 
 
 
