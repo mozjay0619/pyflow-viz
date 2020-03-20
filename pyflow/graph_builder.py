@@ -146,7 +146,7 @@ class GraphBuilder():
         'data_node_color': None,
         'op_node_fontsize': '12',
         'op_node_shape': 'ellipse',
-        'op_node_color': None}
+        'op_node_color': 'white'}
 
         if node_attributes:  # need validity check here
             node_default_attributes.update(node_attributes)
