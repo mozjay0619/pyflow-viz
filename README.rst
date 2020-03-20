@@ -7,7 +7,7 @@ Pyflow is a light weight library that lets the user construct a memory efficient
 Install
 -------
 
-:: 
+.. code:: 
 	pip install -i https://test.pypi.org/simple/ pyflow-viz==0.0b0
 
 Getting started
