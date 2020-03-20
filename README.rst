@@ -233,7 +233,14 @@ To persist all intermediate results, use ``persist`` parameter at ``GraphBuilder
 
 	G = GraphBuilder(persist=True)
 
-With persist enabled, once you run ``a5.get()``, when you try to run ``a4.get()``, the graph will not recompute anything because ``a4`` node result will have been cached in memory. The persist is turned off by default, as it is assumed that the user of the pyflow will process large amounts of data. 
+	a1 = G.add(adding)(1, 2)
+	a2, a3 = G.add(return2, n_out=2)(a1, 3)
+	a4 = G.add(adding)(a1, 5)  # persist here
+	a5 = G.add(adding)(a4, a3)
+
+	a5.get()
+
+With persist enabled, after running ``a5.get()``, when you try to run ``a4.get()``, the graph will not recompute anything because ``a4`` node result will have been cached in memory. The persist is turned off by default, as it is assumed that the user of the pyflow will process large amounts of data. 
 
 To persist parts of the data, you can specify the ``persist`` parameter at ``add`` level:
 
