@@ -71,7 +71,7 @@ What if we have a python function with multiple outputs? Due to dynamic nature o
 
 	G.view()
 
-.. figure:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/multiout.png
+.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/multiout.png
 
 
 Visualizing data flow
