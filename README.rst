@@ -139,7 +139,7 @@ But since at a conceptual level, queries are similarly progenitors of new data, 
 	G.view()
 
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/queryB.png
-   :width: 20pt
+   :width: 3pt
 
 There are much more we can do with styling. We will dedicate a separate section for styling guides. 
 
