@@ -194,7 +194,7 @@ With ``verbose=True``, along with the final output, pyflow will also produce the
 Let's take the tour of this process by looking at the graph. Notice that in verbose mode, the graph will actually print out the uid's of the nodes not just their aliases (more on setting alias later!)
 
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/verbose_.png
-   :width: 5pt
+   :width: 10pt
 
 As tries to compute ``data_12``, it will first activate all the ``OperationNodes`` that is needed for the computation, in out case, those are ``adding_11``, ``adding_8``, ``adding_0``, ``return2_4``. It will then follow the lineage of the graph to work on intermediate results needed to proceed down the graph. Notice that as the computation proceeds, the ``OperationNodes`` that were activated are deactivated. When it gets to ``data_3``, notice that it is needed at both ``adding_8`` and ``return2_4``. Thus, once it completes ``adding_8``, it cannot yet release the memory from ``data_3``: ``data_3 still needed at return2_4``. But as soon as ``return2_4`` is ran, it releases ``data_3`` from memory, as it is not needed anymore: ``data_3 released!``. The ``DataNodes`` with raw inputs such as integers are not released since there is no way for the graph to reconstruct them. 
 
