@@ -78,7 +78,7 @@ def view_full(graph_dict, node_default_attributes, verbose):
                     label=label, 
                     shape=shape, 
                     fontsize=node_default_attributes['op_node_fontsize'], 
-                    height='0.0', width='0.0', color=color, style='filled')
+                    height='0.0', width='0.0', fillcolor=color, style='filled')
 
                 for child in v['children']:
                     label = graph_dict[child]['uid'] if verbose else graph_dict[child]['alias']
@@ -122,7 +122,7 @@ def view_full(graph_dict, node_default_attributes, verbose):
             label=label, 
             shape=shape, 
             fontsize=node_default_attributes['op_node_fontsize'], 
-            height='0.0', width='0.0', color=color, style='filled')
+            height='0.0', width='0.0', fillcolor=color, style='filled')
 
         for child in v['children']:
             label = graph_dict[child]['uid'] if verbose else graph_dict[child]['alias']
