@@ -5,12 +5,20 @@ python:
   - "3.8"
 install: bash build_tools/travis/install.sh
 script: pytest
-deploy:
-  provider: pypi
-  user: "__token__"
-  distributions: sdist bdist_wheel
-  on: 
-    tags: true
-  password:
-    secure: vIDmhHic8z+DPNjXFs8KTp9bvNDjHfjgbWzis3M34aLUxuIq3Z+CZCKC62GlLchORC6CLEz6nE5LFTjpsv7SKFh05Jru0s32afbDzr5bGHfocRrW81AMa3PMevA5GqjNJRRClf4vhKxOHrarLhYb+E6/O73zXe2U14s4PJF+LyhQyfecHbAXv9JFVMgp4UqjOQNEP5jhVD/TtRM5UvZ0PxhW59fHeTWTjXdiIgE4eTCpCjIDHjYMTPPSpbeax0QaHwEn5qIypEpiwbznHnznXZVpNP9gQDc4tjS/8h4uWTx2UqyQHiQICoqy1zcec1RJ3vXGM0X1e9NZsMcyVjSJIxcNKUGbAOSpJ4ljSqBfxQU0GNpupEeyekbWZaKl490rQOSk1aZ53QPzv3kQ+ImwbWcKw06sQ5nwbtisEAZ86o/cw2zRMIMVIySuDrckRouRRe2s9I4fYXQ88XfLd2V5xalh1zS27U3z5SA9LFxB4wibiTHIB0C+MVBzRrGsHPoLSkr70+LJ9RC+HrbqPFLrhGSisVTkI8AD0Il8zoIMs8+pAxqWPRQmQMJe50KFUMALnMJsl+K5bv2xrawN/pDqoUOJJAXJMJYABlDr185TGrQbbcAWCSKJo48lmxWp7/d/QksymxgfyXdPVUHVACyn6y4qo7bjtTpUR1hXSXvus8o=
+jobs:
+  include:
+    - stage: build
+      python: "3.7"
+      script: echo "Starting Pypi build"
+      deploy:
+        provider: pypi
+        user: "__token__"
+        password:
+          secure: vIDmhHic8z+DPNjXFs8KTp9bvNDjHfjgbWzis3M34aLUxuIq3Z+CZCKC62GlLchORC6CLEz6nE5LFTjpsv7SKFh05Jru0s32afbDzr5bGHfocRrW81AMa3PMevA5GqjNJRRClf4vhKxOHrarLhYb+E6/O73zXe2U14s4PJF+LyhQyfecHbAXv9JFVMgp4UqjOQNEP5jhVD/TtRM5UvZ0PxhW59fHeTWTjXdiIgE4eTCpCjIDHjYMTPPSpbeax0QaHwEn5qIypEpiwbznHnznXZVpNP9gQDc4tjS/8h4uWTx2UqyQHiQICoqy1zcec1RJ3vXGM0X1e9NZsMcyVjSJIxcNKUGbAOSpJ4ljSqBfxQU0GNpupEeyekbWZaKl490rQOSk1aZ53QPzv3kQ+ImwbWcKw06sQ5nwbtisEAZ86o/cw2zRMIMVIySuDrckRouRRe2s9I4fYXQ88XfLd2V5xalh1zS27U3z5SA9LFxB4wibiTHIB0C+MVBzRrGsHPoLSkr70+LJ9RC+HrbqPFLrhGSisVTkI8AD0Il8zoIMs8+pAxqWPRQmQMJe50KFUMALnMJsl+K5bv2xrawN/pDqoUOJJAXJMJYABlDr185TGrQbbcAWCSKJo48lmxWp7/d/QksymxgfyXdPVUHVACyn6y4qo7bjtTpUR1hXSXvus8o=
+        distributions: "sdist bdist_wheel"
+        on:
+          tags: true
+          branch: master
+          repo: mozjay0619/pyflow-viz
 
+          
