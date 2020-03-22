@@ -9,7 +9,7 @@ Install
 
 ::
 
-	pip install -i https://test.pypi.org/simple/ pyflow-viz==0.0b0
+	pip install pyflow-viz
 
 Getting started
 ---------------
