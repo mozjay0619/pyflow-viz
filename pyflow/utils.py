@@ -172,15 +172,6 @@ def view_summary(graph_dict, node_default_attributes, verbose):
 
                     op_graph_dict[k]['children'].append(child_op_node_uid)
 
-    #     for parent_data_node_uid in v['parents']:
-
-    #         data_node_prop_dict = data_subgraphs[parent_data_node_uid]
-
-    #         for parent_op_node_uid in data_node_prop_dict['parents']:
-
-    #             if parent_op_node_uid is not None:
-
-    #                 op_graph_dict[k]['parents'].append(parent_op_node_uid)
-
     view_full(op_graph_dict, node_default_attributes, verbose)
+    
     

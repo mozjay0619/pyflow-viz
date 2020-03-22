@@ -19,3 +19,4 @@ class DataHolderNode(BaseNode):
     def __del__(self):
         if self.verbose:
             print('{} released!'.format(self.node_uid))
+

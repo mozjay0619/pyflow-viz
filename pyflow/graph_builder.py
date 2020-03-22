@@ -155,3 +155,4 @@ class GraphBuilder():
             view_summary(self.graph_dict, node_default_attributes, verbose=self.verbose)
         else:
             view_full(self.graph_dict, node_default_attributes, verbose=self.verbose)
+
