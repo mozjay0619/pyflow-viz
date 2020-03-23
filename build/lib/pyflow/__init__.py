@@ -1,18 +1,13 @@
-__version__ = "0.0.b0"
-
+__version__ = "0.1.b1"
 
 from .graph_builder import GraphBuilder
-# # from .cross_validator import CrossValidator
-# # from .estimator import BaseEstimator
-# # from .estimator import XgboostClassification
-# # from .estimator import XgboostRegression
-# # from .optimizer import gp_computation_graph
+from .node import DataHolderNode
+from .node import DataNode
+from .node import OperationNode
 	
 __all__ = [
-	"GraphBuilder"
-# # 	# "CrossValidator", 
-# # 	# "BaseEstimator", 
-# # 	# "XgboostClassification", 
-# # 	# "XgboostRegression", 
-# # 	# "gp_computation_graph"
+	"GraphBuilder",
+	"DataHolderNode",
+	"DataNode",
+	"OperationNode"
 	]

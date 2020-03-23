@@ -50,8 +50,6 @@ class OperationNode(BaseNode):
         else:
             self.child_node_weak_refs[0]().set_value(output_values)
         
-        
-        
         # the immediate parent data nodes
         # if any of these are needed by their child op node other than this one, 
         # we don't release them
@@ -106,3 +104,4 @@ class OperationNode(BaseNode):
                 parent_data_node_weak_ref().release_memory()
                 
         self.deactivate()
+

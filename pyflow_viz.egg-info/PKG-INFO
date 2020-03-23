@@ -1,6 +1,6 @@
 Metadata-Version: 2.1
 Name: pyflow-viz
-Version: 0.0b0
+Version: 0.1b1
 Summary: Lazy computation directed acyclic graph builder
 Home-page: UNKNOWN
 Author: Jay Kim
@@ -14,7 +14,9 @@ Description:
         Install
         -------
         
+        ::
         
+        	pip install pyflow-viz
         
         Getting started
         ---------------
@@ -65,10 +67,10 @@ Description:
         	from pyflow import GraphBuilder
         
         	def adding(a, b):
-        	    return a + b
+        		return a + b
         
         	def multi_output_method(a, b):
-        	    return a+1, b+1
+        		return a+1, b+1
         
         	G = GraphBuilder()
         	a1 = G.add(adding)(2, 2)
@@ -106,19 +108,19 @@ Description:
         	from pyflow import GraphBuilder
         
         	def query_dataframe_A():
-            return 1  # pretend this was a pandas or Spark dataframe!
+        	return 1  # pretend this was a pandas or Spark dataframe!
         
         	def query_dataframe_B():
-        	    return 2
+        		return 2
         
         	def product_transform(inp):
-        	    return inp*2
+        		return inp*2
         
         	def join_transform(inp1, inp2):
-        	    return inp1 + inp2
+        		return inp1 + inp2
         
         	def split_transform(inp):
-        	    return inp+1, inp+2
+        		return inp+1, inp+2
         
         	G = GraphBuilder()
         	df1 = G.add(query_dataframe_A)()
@@ -163,10 +165,10 @@ Description:
         	from pyflow import GraphBuilder
         
         	def adding(a, b):
-        	    return a + b
+        		return a + b
         
         	def multi_output_method(a, b):
-        	    return a+1, b+1
+        		return a+1, b+1
         
         	G = GraphBuilder(verbose=True)
         	a1 = G.add(adding)(1, 2)
