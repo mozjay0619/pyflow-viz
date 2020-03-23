@@ -5,17 +5,14 @@ python:
 - '3.8'
 install: bash build_tools/travis/install.sh
 script: pytest
-jobs:
-  include:
-  - stage: build
-    python: '3.7'
-    script: echo "Starting Pypi build"
-    deploy:
-      provider: pypi
-      user: __token__
-      distributions: sdist bdist_wheel
-      password:
-        secure: D1TDjxku4krr7SPSuTAjqvM33tlNUqgG1phI7ORPRELno0Fu/KBuvS88uarnc2wTXayEFeTpthQxL+kAnXLOWIKzQhfwmUdVB2ECC+s4TWezbmHgjcMQC4CMQWrTqpQNS6WrI1XP92E8gAkcX9V4ckEPisTdb5KZyIvsO+zUEbbaT4/4PpAJGTODOoy2f0yBTOBMrA8ozyqFDFYG0Q7lacDoB+tK14IpgWp9Snu8Duxlg/e0UAwU8wN5tzB3gtOQnH82r65WfoMYLNlgC0jd+pvHkOADltX7Svgw5dk4Nj3kz8ycgDa/vdsH2BivNfFqmQ38TM0SnPmvUqOpG2EMJG0oVPCr0cMl0TIpRtcZ8eQOrIKRkxe8oF7KdLPu/tOO9jduXh5qlpXTIeXNnmKzM39TdXjahA+31Vc+TB4+eGXv9u5qfpzq4yVQguVgBaEFzBhvRhrDo+JD1DAYa58iZy+pHhkxEqrCVkhs7+hPE1P5xCKcQpjHTl+E/gnqMJdQqJXnPcvTMm6CtauYLB13IDZB9q7XmHbBKOHx9eyy4d4jn2dHiPzOi4xeFxPFAhslyr7MUpY+izCyA7PMtqth7xhs/dpknz4GMufXQNnof8PIjQ/lJnEAbOk3Cr2jbb5JFEJ/P1V/rsCXYzX374RTaztfsgDDeTIXrXH5Kzt3chs=
-      on:
-        tags: true
-        branch: master
+deploy:
+  provider: pypi
+  user: __token__
+  distributions: sdist bdist_wheel
+  on:
+    tags: true
+    condition: "$PYTHON_VERSION = 3.7"
+  skip_cleanup: true
+  skip_existing: true
+  password:
+    secure: Awww+2mwgWQ2d9L7iFbZra5eTHKTu8C/bfZizVw1sv+w0H2HYoi6ephZaZbjf2sG6MBt72+ufx58AJDIzR0UfkDjRUan5KuyYF1oIMPMzjD3zv9Vc/WriN/tVvOv1GyNuVOILP1kHewS+s2yR7GtfanL/92c01BCYrtNkDSXE/5kN+v+gp8ercFzhs8REfsJ4+fZVG46GDa/enX8BwO9FdC4O9q0CG4Kq2IZ9O2aAu9PwxCclpIEsYO7eHUavFvVuhABFP0aIrbRYck8maNYg5IemJZ8p3HVmBYqM25JsgTiEw93oSXIO3OPsx1BCLZn2H7Txorz8+K612rZr9bWvYluJCWout1LGwvz9/4QIBNnl/w+VACQiGCarLDonN3LwqZsAI2/brPtRUnQORVmFznU8817kLCRcXgoYMU8BSUcnkgA6c6BIdFwRsA+VUNjEsaxiwuSGF2Gbv3q8jTGIMlZEFe+pwT4bRJr7AxUk2bd+5FcHvIMi7XLVZqfC4iLgO6pwiJOQvEqYKOVCmPsd+5qp3I07qrMjXeOkrxU8JwY2C11vzV4GO4hUQm5q3rdfb6S2Po1W0+nxbjBnm8X0Q4FHPxXukuqvusnkZ1cdbftrVBlwtsWH2jALDkvPcC+7UvWIwG2ksv4BpmVBziFclXbZH/8fkHX9IN+txb0B/s=
