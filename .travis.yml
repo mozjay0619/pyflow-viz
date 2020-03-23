@@ -1,24 +1,21 @@
 language: python
 python:
-  - "3.6"
-  - "3.7"
-  - "3.8"
+- '3.6'
+- '3.7'
+- '3.8'
 install: bash build_tools/travis/install.sh
 script: pytest
 jobs:
   include:
-    - stage: build
-      python: "3.7"
-      script: echo "Starting Pypi build"
-      deploy:
-        provider: pypi
-        user: "__token__"
-        password:
-          secure: vIDmhHic8z+DPNjXFs8KTp9bvNDjHfjgbWzis3M34aLUxuIq3Z+CZCKC62GlLchORC6CLEz6nE5LFTjpsv7SKFh05Jru0s32afbDzr5bGHfocRrW81AMa3PMevA5GqjNJRRClf4vhKxOHrarLhYb+E6/O73zXe2U14s4PJF+LyhQyfecHbAXv9JFVMgp4UqjOQNEP5jhVD/TtRM5UvZ0PxhW59fHeTWTjXdiIgE4eTCpCjIDHjYMTPPSpbeax0QaHwEn5qIypEpiwbznHnznXZVpNP9gQDc4tjS/8h4uWTx2UqyQHiQICoqy1zcec1RJ3vXGM0X1e9NZsMcyVjSJIxcNKUGbAOSpJ4ljSqBfxQU0GNpupEeyekbWZaKl490rQOSk1aZ53QPzv3kQ+ImwbWcKw06sQ5nwbtisEAZ86o/cw2zRMIMVIySuDrckRouRRe2s9I4fYXQ88XfLd2V5xalh1zS27U3z5SA9LFxB4wibiTHIB0C+MVBzRrGsHPoLSkr70+LJ9RC+HrbqPFLrhGSisVTkI8AD0Il8zoIMs8+pAxqWPRQmQMJe50KFUMALnMJsl+K5bv2xrawN/pDqoUOJJAXJMJYABlDr185TGrQbbcAWCSKJo48lmxWp7/d/QksymxgfyXdPVUHVACyn6y4qo7bjtTpUR1hXSXvus8o=
-        distributions: "sdist bdist_wheel"
-        on:
-          tags: true
-          branch: master
-          repo: mozjay0619/pyflow-viz
-
-          
+  - stage: build
+    python: '3.7'
+    script: echo "Starting Pypi build"
+    deploy:
+      provider: pypi
+      user: __token__
+      distributions: sdist bdist_wheel
+      password:
+        secure: D1TDjxku4krr7SPSuTAjqvM33tlNUqgG1phI7ORPRELno0Fu/KBuvS88uarnc2wTXayEFeTpthQxL+kAnXLOWIKzQhfwmUdVB2ECC+s4TWezbmHgjcMQC4CMQWrTqpQNS6WrI1XP92E8gAkcX9V4ckEPisTdb5KZyIvsO+zUEbbaT4/4PpAJGTODOoy2f0yBTOBMrA8ozyqFDFYG0Q7lacDoB+tK14IpgWp9Snu8Duxlg/e0UAwU8wN5tzB3gtOQnH82r65WfoMYLNlgC0jd+pvHkOADltX7Svgw5dk4Nj3kz8ycgDa/vdsH2BivNfFqmQ38TM0SnPmvUqOpG2EMJG0oVPCr0cMl0TIpRtcZ8eQOrIKRkxe8oF7KdLPu/tOO9jduXh5qlpXTIeXNnmKzM39TdXjahA+31Vc+TB4+eGXv9u5qfpzq4yVQguVgBaEFzBhvRhrDo+JD1DAYa58iZy+pHhkxEqrCVkhs7+hPE1P5xCKcQpjHTl+E/gnqMJdQqJXnPcvTMm6CtauYLB13IDZB9q7XmHbBKOHx9eyy4d4jn2dHiPzOi4xeFxPFAhslyr7MUpY+izCyA7PMtqth7xhs/dpknz4GMufXQNnof8PIjQ/lJnEAbOk3Cr2jbb5JFEJ/P1V/rsCXYzX374RTaztfsgDDeTIXrXH5Kzt3chs=
+      on:
+        tags: true
+        branch: master

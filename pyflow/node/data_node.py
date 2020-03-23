@@ -1,6 +1,9 @@
 from .base_node import BaseNode
 from .data_holder_node import DataHolderNode
 
+import warnings
+
+
 class DataNode(BaseNode):
     
     def __init__(self, node_uid, value=None, persist=False, verbose=False, alias=None):
@@ -73,7 +76,7 @@ class DataNode(BaseNode):
     def release_memory(self):
         
         if self.is_persisted():
-            print('dont do it!') # exception? warning?
+            warnings.warn("You are releasing a DataNode that was persisted!", RuntimeWarning)
         
         del self.value_holder
         self.value_holder = DataHolderNode(self.node_uid, None, self.verbose)
