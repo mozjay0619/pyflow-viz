@@ -3,6 +3,7 @@ from .node import OperationNode
 from .utils import ExtendedRef
 from .utils import view_full
 from .utils import view_summary
+from .utils import save_graph_image
 
 from collections import defaultdict
 import sys
@@ -152,7 +153,18 @@ class GraphBuilder():
             node_default_attributes.update(node_attributes)
         
         if summary:
-            view_summary(self.graph_dict, node_default_attributes, verbose=self.verbose)
+            return view_summary(self.graph_dict, node_default_attributes, verbose=self.verbose)
         else:
-            view_full(self.graph_dict, node_default_attributes, verbose=self.verbose)
+            return view_full(self.graph_dict, node_default_attributes, verbose=self.verbose)
+
+    def save_view(self, summary=True, node_attributes=None, dirpath=None, filename='digraph', fileformat='png'):
+
+        if fileformat not in ['pdf', 'png']:
+            raise TypeError("Expected fileformat to be 'pdf' or 'png', but instead "
+                            "got {}".format(fileformat))
+
+        graph = self.view(summary, node_attributes)
+        img_filepath = save_graph_image(graph, dirpath, filename, fileformat)
+        return img_filepath
+
 
