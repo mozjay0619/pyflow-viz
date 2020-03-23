@@ -1,5 +1,6 @@
 import weakref
 import copy
+import os
 
 from graphviz import Digraph
 
@@ -137,8 +138,6 @@ def view_full(graph_dict, node_default_attributes, verbose):
         for parent in v['parents']:
             label = graph_dict[parent]['uid'] if verbose else graph_dict[parent]['alias']
 
-
-
             graph.node(
                 parent, 
                 label=label,
@@ -147,7 +146,7 @@ def view_full(graph_dict, node_default_attributes, verbose):
                 height='0.0', width='0.0')
             graph.edge(parent, k)
 
-    graph.view()
+    return graph
 
 def view_summary(graph_dict, node_default_attributes, verbose):
     
@@ -172,6 +171,25 @@ def view_summary(graph_dict, node_default_attributes, verbose):
 
                     op_graph_dict[k]['children'].append(child_op_node_uid)
 
-    view_full(op_graph_dict, node_default_attributes, verbose)
+    return view_full(op_graph_dict, node_default_attributes, verbose)
     
+def save_graph_image(graph, dirpath=None, filename=None, fileformat=None):
+    
+    graph.format = 'png' or fileformat
+    try:
+        dirpath = os.getcwd() or dirpath
+        filename = 'digraph' or filename
+        filename = filename
+        graph.view(filename=filename, directory=dirpath)
+    except FileNotFoundError:
+        pass
+    finally:
+        img_filepath = os.path.join(dirpath, filename + '.' + graph.format)
+        dot_filepath = os.path.join(dirpath, filename)
+        if not os.path.exists(img_filepath):
+            raise FileNotFoundError('{} image file not found!'.format(img_filepath))
+        if os.path.exists(dot_filepath):
+            os.remove(dot_filepath)
+    
+    return img_filepath
     
