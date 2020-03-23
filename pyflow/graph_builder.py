@@ -7,7 +7,7 @@ from .utils import view_summary
 from collections import defaultdict
 import sys
 
-MAX_INTEGER = sys.maxsize  # for python3 only
+MAX_INTEGER = sys.maxsize  # for python3 only need sys.maxint for python2
 
 class GraphBuilder():
     
@@ -155,3 +155,4 @@ class GraphBuilder():
             view_summary(self.graph_dict, node_default_attributes, verbose=self.verbose)
         else:
             view_full(self.graph_dict, node_default_attributes, verbose=self.verbose)
+

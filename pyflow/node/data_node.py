@@ -77,6 +77,5 @@ class DataNode(BaseNode):
         
         del self.value_holder
         self.value_holder = DataHolderNode(self.node_uid, None, self.verbose)
-
         
         

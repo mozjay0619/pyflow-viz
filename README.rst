@@ -9,7 +9,7 @@ Install
 
 ::
 
-	pip install -i https://test.pypi.org/simple/ pyflow-viz==0.0b0
+	pip install pyflow-viz
 
 Getting started
 ---------------
@@ -60,10 +60,10 @@ What if we have a python function with multiple outputs? Due to dynamic nature o
 	from pyflow import GraphBuilder
 
 	def adding(a, b):
-	    return a + b
+		return a + b
 
 	def multi_output_method(a, b):
-	    return a+1, b+1
+		return a+1, b+1
 
 	G = GraphBuilder()
 	a1 = G.add(adding)(2, 2)
@@ -101,19 +101,19 @@ Pyflow lets the user customize the DAG visuals to a certain degree, with more to
 	from pyflow import GraphBuilder
 
 	def query_dataframe_A():
-    return 1  # pretend this was a pandas or Spark dataframe!
+	return 1  # pretend this was a pandas or Spark dataframe!
 
 	def query_dataframe_B():
-	    return 2
+		return 2
 
 	def product_transform(inp):
-	    return inp*2
+		return inp*2
 
 	def join_transform(inp1, inp2):
-	    return inp1 + inp2
+		return inp1 + inp2
 
 	def split_transform(inp):
-	    return inp+1, inp+2
+		return inp+1, inp+2
 
 	G = GraphBuilder()
 	df1 = G.add(query_dataframe_A)()
@@ -158,10 +158,10 @@ When you invoke ``get`` method, pyflow will only then evaluate, and it will eval
 	from pyflow import GraphBuilder
 
 	def adding(a, b):
-	    return a + b
+		return a + b
 
 	def multi_output_method(a, b):
-	    return a+1, b+1
+		return a+1, b+1
 
 	G = GraphBuilder(verbose=True)
 	a1 = G.add(adding)(1, 2)

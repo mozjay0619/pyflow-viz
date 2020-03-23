@@ -18,5 +18,5 @@ setup(
 	url=None,
 	license="DSB 3-clause",
 	packages=find_packages(),
-	install_requires=["graphviz"]
+	install_requires=["graphviz>=0.13.2"]
 	)
