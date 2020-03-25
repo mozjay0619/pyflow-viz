@@ -148,6 +148,18 @@ But since at a conceptual level, queries are similarly progenitors of new data, 
 There are much more we can do with styling. We will dedicate a separate section for styling guides. 
 
 
+Saving your DAG image
+---------------------
+
+You can easily save your DAG image by invoking ``save_view`` method, which returns the file path of the saved image:
+
+.. code:: python
+
+	G.save_view()
+
+The ``save_view`` method also has ``summary`` boolean parameter. You can also set the file name and file path by passing in ``dirpath`` and ``filename`` parameter. They default to current working directory and "digraph" respectively. You can also set the file format as png or pdf by setting ``fileformat`` parameter. The default is png. 
+
+
 Computation and memory efficiency of Pyflow
 -------------------------------------------
 
@@ -163,7 +175,7 @@ When you invoke ``get`` method, pyflow will only then evaluate, and it will eval
 	def multi_output_method(a, b):
 		return a+1, b+1
 
-	G = GraphBuilder(verbose=True)
+	G = GraphBuilder(verbose=True)  # set verbose to True
 	a1 = G.add(adding)(1, 2)
 	a2, a3 = G.add(return2, n_out=2)(a1, 3)
 	a4 = G.add(adding)(a1, 5)
@@ -201,7 +213,7 @@ Let's take the tour of this process by looking at the graph. Notice that in verb
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/verbose_.png
    :width: 10pt
 
-As pyflow tries to compute ``data_12``, it will first activate all the ``OperationNodes`` that is needed for the computation, in out case, those are ``adding_11``, ``adding_8``, ``adding_0``, ``return2_4``. It will then follow the lineage of the graph to work on intermediate results needed to proceed down the graph. Notice that as the computation proceeds, the ``OperationNodes`` that were activated are deactivated. When it gets to ``data_3``, notice that it is needed at both ``adding_8`` and ``return2_4``. Thus, once it completes ``adding_8``, it cannot yet release the memory from ``data_3``: ``data_3 still needed at return2_4``. But as soon as ``return2_4`` is ran, it releases ``data_3`` from memory, as it is not needed anymore: ``data_3 released!``. The ``DataNodes`` with raw inputs such as integers are not released since there is no way for the graph to reconstruct them. 
+As pyflow tries to compute ``data_12``, it will first activate all the ``OperationNodes`` that is needed for the computation, in our case, those are ``adding_11``, ``adding_8``, ``adding_0``, ``return2_4``. It will then follow the lineage of the graph to work on intermediate results needed to proceed down the graph. Notice that as the computation proceeds, the ``OperationNodes`` that were activated are deactivated. When it gets to ``data_3``, notice that it is needed at both ``adding_8`` and ``return2_4``. Thus, once it completes ``adding_8``, it cannot yet release the memory from ``data_3``: ``data_3 still needed at return2_4``. But as soon as ``return2_4`` is ran, it releases ``data_3`` from memory, as it is not needed anymore: ``data_3 released!``. The ``DataNodes`` with raw inputs such as integers are not released since there is no way for the graph to reconstruct them. 
 
 By the same token, if you were to run the graph from middle, say, at ``a4``:
 
@@ -233,7 +245,7 @@ To persist all intermediate results, use ``persist`` parameter at ``GraphBuilder
 
 	from pyflow import GraphBuilder
 
-	G = GraphBuilder(persist=True)
+	G = GraphBuilder(persist=True)  # set persist to True
 
 	a1 = G.add(adding)(1, 2)
 	a2, a3 = G.add(return2, n_out=2)(a1, 3)
