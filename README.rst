@@ -28,7 +28,7 @@ Let's construct a simple computation graph: (Note the similarity of API to that 
 	a2 = G.add(adding)(3, a1)
 	a3 = G.add(adding)(a1, a2)
 
-At this point, no evaluation has occurred. Also, the outputs ``a1``, ``a2``, and ``a3`` are ``DataNode`` objects (well, more precisely, weak references to the ``DataNode`` objects, but more on this later!)
+At this point, no evaluation has occurred. Also, the outputs ``a1``, ``a2``, and ``a3`` are ``DataNode`` objects (well, more precisely, weak references to the ``DataNode`` objects)
 You can kick off the evaluation by invoking ``get`` method from any of the output objects:
 
 .. code:: python
@@ -101,7 +101,7 @@ Pyflow lets the user customize the DAG visuals to a certain degree, with more to
 	from pyflow import GraphBuilder
 
 	def query_dataframe_A():
-	return 1  # pretend this was a pandas or Spark dataframe!
+		return 1  # pretend this was a pandas or Spark dataframe!
 
 	def query_dataframe_B():
 		return 2
@@ -272,8 +272,6 @@ To persist parts of the data, you can specify the ``persist`` parameter at ``add
 	a5.get()
 
 Then, when you run ``a4.get()`` it will not rerun the computation as ``a4`` result has been cached in memory although all other intermediate results will have been released.  
-
-
 
 
 
