@@ -227,7 +227,8 @@ Pyflow will create graph accordingly, such that the outputless operation node is
 	G.view(summary=False)
 
 
-
+.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/realisticGraph.png
+   :width: 10pt
 
 
 This is a more realistic shape of the DAG in the actual use case of data preprocessing. 
