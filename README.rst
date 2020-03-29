@@ -224,7 +224,8 @@ Pyflow will create graph accordingly, such that the outputless operation node is
 	G.add(save_data)(dfb)
 	G.add(save_data)(joined_df)
 
-	G.view(summary=False)
+	graph_attributes = {'graph_ranksep': 0.25}
+	G.view(summary=False, graph_attributes=graph_attributes)
 
 
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/realisticGraph.png
@@ -233,6 +234,7 @@ Pyflow will create graph accordingly, such that the outputless operation node is
 
 This is a more realistic shape of the DAG in the actual use case of data preprocessing. 
 
+Also, this is why
 
 Saving your DAG image
 ---------------------
