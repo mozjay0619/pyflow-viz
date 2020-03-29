@@ -167,14 +167,6 @@ But then we might want to make the DAG a little shorter, especially if we are to
 
 	graph_attributes = {'graph_ranksep': 0.25}
 
-	# 'data_node_fontsize': 11, 
-	# 'data_node_shape': 'box',
-	# 'data_node_color': None,
-	# 'op_node_fontsize': 12,
-	# 'op_node_shape': 'ellipse',
-	# 'op_node_color': 'white',
-	# 'graph_ranksep': 0.475
-
 	G.view(graph_attributes=graph_attributes)
 
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/shorterGraph.png
@@ -185,6 +177,14 @@ You can take a look and play around with the rest of the configurations:
 .. code:: python
 
 	G.graph_attributes 
+
+	# 'data_node_fontsize': 11, 
+	# 'data_node_shape': 'box',
+	# 'data_node_color': None,
+	# 'op_node_fontsize': 12,
+	# 'op_node_shape': 'ellipse',
+	# 'op_node_color': 'white',
+	# 'graph_ranksep': 0.475
 
 	# the default settings are found at:
 	G.default_graph_attributes
