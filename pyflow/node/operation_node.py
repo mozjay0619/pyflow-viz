@@ -33,6 +33,12 @@ class OperationNode(BaseNode):
         self.is_active = False
         
     def run(self):
+        """run method will do four things with respect to the current op node
+        1. it will get values from the parent data node(s)
+        2. then, it will run its func and obtain its output value(s)
+        3. then, it will set the value of its child data node(s) with the output value(s) (plural if n_out>1)
+        4. then, it will try to release the memory from its parent data nodes
+        """
         
         # these strong references will be destroyed once we leave this scope
         parent_data_nodes_values = [parent_data_node_weak_ref().get() 
@@ -48,7 +54,11 @@ class OperationNode(BaseNode):
             for i, output_value in enumerate(output_values):
                 self.child_node_weak_refs[i]().set_value(output_value)
         else:
-            self.child_node_weak_refs[0]().set_value(output_values)
+            # if the method of current op node has no return statement
+            if len(self.child_node_weak_refs) == 0:
+                pass
+            else:
+                self.child_node_weak_refs[0]().set_value(output_values)
         
         # the immediate parent data nodes
         # if any of these are needed by their child op node other than this one, 

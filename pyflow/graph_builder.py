@@ -4,9 +4,11 @@ from .utils import ExtendedRef
 from .utils import view_full
 from .utils import view_summary
 from .utils import save_graph_image
+from .utils import contains_return_statement
 
 from collections import defaultdict
 import sys
+import copy
 
 MAX_INTEGER = sys.maxsize  # for python3 only need sys.maxint for python2
 
@@ -20,10 +22,22 @@ class GraphBuilder():
         self.node_count = -1
         self.strong_ref_dict = {}
         self.graph_dict = defaultdict(dict)
+
+        self.default_graph_attributes = {
+        'data_node_fontsize': 11, 
+        'data_node_shape': 'box',
+        'data_node_color': None,
+        'op_node_fontsize': 12,
+        'op_node_shape': 'ellipse',
+        'op_node_color': 'white',
+        'graph_ranksep': 0.475
+        }
+        self.user_defined_graph_attributes = None
     
-    def add(self, func, output_alias=None, n_out=1, persist=False, rank=None, color=None, shape=None, fontsize=None):
+    def add(self, func, method_alias=None, output_alias=None, n_out=1, persist=False, rank=None, color=None, shape=None, fontsize=None):
         
         self.func = func
+        self.method_alias = method_alias
         self.output_alias = output_alias
         self.n_out = n_out
         self.func_persist = persist
@@ -42,7 +56,12 @@ class GraphBuilder():
     def __call__(self, *args):
 
         self.node_count += 1
-        op_node_uid = '{}_{}'.format(self.func.__name__, self.node_count)
+
+        if self.method_alias:
+            op_node_uid = '{}_{}'.format(self.method_alias, self.node_count)
+        else:
+            op_node_uid = '{}_{}'.format(self.func.__name__, self.node_count)
+
         self.strong_ref_dict[op_node_uid] = OperationNode(op_node_uid, self.func, self.n_out, 
                                                           verbose=self.verbose)
         op_node_weak_ref = ExtendedRef(self.strong_ref_dict[op_node_uid])
@@ -80,9 +99,18 @@ class GraphBuilder():
                 
         # create edge: op_node --> children data_nodes
         for i in range(self.n_out):
+
+            # if the current method has no return statement, we do not want to create a child data node
+            if not contains_return_statement(self.func):
+                continue
             
             self.node_count += 1
-            child_data_node_uid = 'data_{}'.format(self.node_count)
+
+            if self.output_alias:
+                child_data_node_uid = '{}_{}'.format(self.output_alias, self.node_count)
+            else:
+                child_data_node_uid = 'data_{}'.format(self.node_count)
+
             persist_this_node = self.persist or self.func_persist
             self.strong_ref_dict[child_data_node_uid] = DataNode(node_uid=child_data_node_uid, 
                                                                  verbose=self.verbose, persist=persist_this_node, alias=self.output_alias)
@@ -136,34 +164,63 @@ class GraphBuilder():
         if self.n_out > 1:
             return op_node_weak_ref().child_node_weak_refs
         else:
-            return op_node_weak_ref().child_node_weak_refs[0]
+            if len(op_node_weak_ref().child_node_weak_refs) == 0:
+                return None
+            else:
+                return op_node_weak_ref().child_node_weak_refs[0]
+
+    def run(self, *args):    
+
+        requested_data_node_uids = [elem().node_uid for elem in args]
         
-    def view(self, summary=True, node_attributes=None):
+        requested_data_nodes_dict = {k: v for k, v in self.strong_ref_dict.items() 
+                                     if v.node_uid in requested_data_node_uids}
+        
+        for k, v in requested_data_nodes_dict.items():
+            v.persist()
+        
+        op_nodes_dict = {k: v for k, v in self.strong_ref_dict.items() if v.node_type == 'operation'}
 
-        # update node_default_attributes
-        node_default_attributes = {
-        'data_node_fontsize': '11', 
-        'data_node_shape': 'box',
-        'data_node_color': None,
-        'op_node_fontsize': '12',
-        'op_node_shape': 'ellipse',
-        'op_node_color': 'white'}
+        for k, v in op_nodes_dict.items():
+            v.activate()
+        
+        for k, v in op_nodes_dict.items():
+            v.run()
+        
+        return args
 
-        if node_attributes:  # need validity check here
-            node_default_attributes.update(node_attributes)
+    @property
+    def graph_attributes(self):
+
+        if self.user_defined_graph_attributes:
+            graph_attributes = copy.copy(self.default_graph_attributes)
+            graph_attributes.update(self.user_defined_graph_attributes)
+        else:
+            graph_attributes = copy.copy(self.default_graph_attributes)
+
+        return graph_attributes
+
+    def _graph_attributes(self):
+
+        return {k: str(v) for k, v in self.graph_attributes.items()}
+
+    def view(self, summary=True, graph_attributes=None):
+
+        if graph_attributes:  # need validity check here
+            self.user_defined_graph_attributes = graph_attributes
         
         if summary:
-            return view_summary(self.graph_dict, node_default_attributes, verbose=self.verbose)
+            return view_summary(self.graph_dict, self._graph_attributes(), verbose=self.verbose)
         else:
-            return view_full(self.graph_dict, node_default_attributes, verbose=self.verbose)
+            return view_full(self.graph_dict, self._graph_attributes(), verbose=self.verbose)
 
-    def save_view(self, summary=True, node_attributes=None, dirpath=None, filename='digraph', fileformat='png'):
+    def save_view(self, summary=True, graph_attributes=None, dirpath=None, filename='digraph', fileformat='png'):
 
         if fileformat not in ['pdf', 'png']:
             raise TypeError("Expected fileformat to be 'pdf' or 'png', but instead "
                             "got {}".format(fileformat))
 
-        graph = self.view(summary, node_attributes)
+        graph = self.view(summary, graph_attributes)
         img_filepath = save_graph_image(graph, dirpath, filename, fileformat)
         return img_filepath
 
