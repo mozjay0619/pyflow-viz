@@ -178,6 +178,9 @@ You can take a look and play around with the rest of the configurations:
 
 	G.graph_attributes 
 
+	# the default settings are found at:
+	G.default_graph_attributes
+
 	# 'data_node_fontsize': 11, 
 	# 'data_node_shape': 'box',
 	# 'data_node_color': None,
@@ -186,8 +189,7 @@ You can take a look and play around with the rest of the configurations:
 	# 'op_node_color': 'white',
 	# 'graph_ranksep': 0.475
 
-	# the default settings are found at:
-	G.default_graph_attributes
+
 
 
 No output methods

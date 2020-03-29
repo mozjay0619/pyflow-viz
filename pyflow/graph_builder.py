@@ -24,13 +24,13 @@ class GraphBuilder():
         self.graph_dict = defaultdict(dict)
 
         self.default_graph_attributes = {
-        'data_node_fontsize': 11, 
-        'data_node_shape': 'box',
-        'data_node_color': None,
-        'op_node_fontsize': 12,
-        'op_node_shape': 'ellipse',
-        'op_node_color': 'white',
-        'graph_ranksep': 0.475
+            'data_node_fontsize': 11, 
+            'data_node_shape': 'box',
+            'data_node_color': None,
+            'op_node_fontsize': 12,
+            'op_node_shape': 'ellipse',
+            'op_node_color': 'white',
+            'graph_ranksep': 0.475
         }
         self.user_defined_graph_attributes = None
     
@@ -128,9 +128,9 @@ class GraphBuilder():
                 self.graph_dict[parent_data_node_uid]['children'].append(op_node_weak_ref().node_uid)
             else:
                 node_graph_attributes_dict = {'rank': MAX_INTEGER, 
-                                      'color': None, 
-                                      'shape': None,
-                                      'fontsize': self.fontsize}
+                                              'color': None, 
+                                              'shape': None,
+                                              'fontsize': self.fontsize}
                 node_properties_dict = {'children': [op_node_weak_ref().node_uid], 
                                         'parents': [], 
                                         'type': 'data',
@@ -150,9 +150,9 @@ class GraphBuilder():
                 self.graph_dict[parent_data_node_uid]['parents'].append(op_node_weak_ref().node_uid)
             else:
                 node_graph_attributes_dict = {'rank': MAX_INTEGER, 
-                                      'color': None, 
-                                      'shape': None,
-                                      'fontsize': self.fontsize}
+                                              'color': None, 
+                                              'shape': None,
+                                              'fontsize': self.fontsize}
                 node_properties_dict = {'children': [], 
                                         'parents': [op_node_weak_ref().node_uid], 
                                         'type': 'data', 
