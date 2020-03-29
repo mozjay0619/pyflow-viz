@@ -339,6 +339,9 @@ You will see:
 
 In this case, since ``return2_4`` is not activated, the ``data_3`` does not consider its presence in deciding release of memory. 
 
+Memory persistance with Pyflow
+------------------------------
+
 Lastly, you have the option of either persisting all of the intermediate results, or persisting part of the intermediate results.
 
 To persist all intermediate results, use ``persist`` parameter at ``GraphBuilder`` level:
@@ -375,5 +378,5 @@ To persist parts of the data, you can specify the ``persist`` parameter at ``add
 
 Then, when you run ``a4.get()`` it will not rerun the computation as ``a4`` result has been cached in memory although all other intermediate results will have been released.  
 
-
+At last, we can understand the difference between ``run()`` and ``run(a1, a3)``. Even if you don't persist anything, either at the graph level or the node level, by passing in the ``a1, a3``, the graph will automatically persist their data for you. So when you call ``get`` on ``a1 and a3``, after the graph is run, there won't be any recalculations, as the data have been persisted in those data nodes. 
 
