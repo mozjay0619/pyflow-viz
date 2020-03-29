@@ -172,7 +172,15 @@ But then we might want to make the DAG a little shorter, especially if we are to
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/shorterGraph.png
    :width: 10pt
 
+You can take a look and play around with the rest of the configurations: 
 
+.. code:: python
+
+	G.graph_attributes 
+
+	# the default settings are found at:
+	G.default_graph_attributes
+	
 
 No output methods
 -----------------
@@ -232,7 +240,7 @@ Pyflow will create graph accordingly, such that the outputless operation node is
    :width: 10pt
 
 
-This is a more realistic shape of the DAG in the actual use case of data preprocessing. Also, this is why ``run`` method makes more sense to use then ``get`` method. 
+This is a more realistic shape of the DAG in the actual use case of data preprocessing. Also, this is why ``run`` method makes more sense to use then ``get`` method in most realistic use cases. As you can see above, there is no data node from which we can call ``get`` method to retrieve the data. We are not interested in the data per se as we are in what we can do with the data. And most of the time, when we do something with our data, the end result is not another data. This does not mean you shouldn't use ``get``. There might be situations where you might want to get the data back, especially during interactive sessions. 
 
 Saving your DAG image
 ---------------------
