@@ -19,6 +19,10 @@ class DataNode(BaseNode):
     def has_value(self):
         
         return self.value_holder.has_value()
+
+    def persist(self):
+
+        self.data_persist = True
         
     def is_persisted(self):
         
