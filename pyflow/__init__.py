@@ -1,4 +1,4 @@
-__version__ = "0.3"
+__version__ = "0.4"
 
 from .graph_builder import GraphBuilder
 from .node import DataHolderNode

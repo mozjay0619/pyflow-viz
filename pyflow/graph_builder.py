@@ -7,6 +7,7 @@ from .utils import save_graph_image
 from .utils import contains_return_statement
 
 from collections import defaultdict
+from collections import Iterable
 import sys
 import copy
 
@@ -39,8 +40,14 @@ class GraphBuilder():
         self.func = func
         self.method_alias = method_alias
         self.output_alias = output_alias
+
         self.n_out = n_out
         self.func_persist = persist
+
+        if ( not isinstance(self.output_alias, list) and not isinstance(self.output_alias, tuple) ):
+            self.output_alias = [self.output_alias]
+        if not output_alias:
+            self.output_alias *= n_out
         
         if rank is None:
             self.rank = MAX_INTEGER
@@ -63,7 +70,7 @@ class GraphBuilder():
             op_node_uid = '{}_{}'.format(self.func.__name__, self.node_count)
 
         self.strong_ref_dict[op_node_uid] = OperationNode(op_node_uid, self.func, self.n_out, 
-                                                          verbose=self.verbose)
+                                                          verbose=self.verbose, alias=self.method_alias)
         op_node_weak_ref = ExtendedRef(self.strong_ref_dict[op_node_uid])
         
         node_graph_attributes_dict = {'rank': self.rank, 
@@ -106,14 +113,14 @@ class GraphBuilder():
             
             self.node_count += 1
 
-            if self.output_alias:
-                child_data_node_uid = '{}_{}'.format(self.output_alias, self.node_count)
+            if self.output_alias[0]:
+                child_data_node_uid = '{}_{}'.format(self.output_alias[i], self.node_count)
             else:
                 child_data_node_uid = 'data_{}'.format(self.node_count)
 
             persist_this_node = self.persist or self.func_persist
             self.strong_ref_dict[child_data_node_uid] = DataNode(node_uid=child_data_node_uid, 
-                                                                 verbose=self.verbose, persist=persist_this_node, alias=self.output_alias)
+                                                                 verbose=self.verbose, persist=persist_this_node, alias=self.output_alias[i])
             data_node_weak_ref = ExtendedRef(self.strong_ref_dict[child_data_node_uid])
             op_node_weak_ref().child_node_weak_refs.append(data_node_weak_ref)
             
