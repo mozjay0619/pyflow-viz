@@ -189,7 +189,28 @@ You can take a look and play around with the rest of the configurations:
 	# 'op_node_color': 'white',
 	# 'graph_ranksep': 0.475
 
+Finally, you can set the alias of the nodes by passing in ``method_alias`` and/or ``output_alias`` in the ``add`` method. The ``method_alias`` will set the alias of the operation node being added, and ``output_alias`` will set the alias of the child data node of that operation node. 
 
+.. code:: python
+
+	G = GraphBuilder()
+	df1 = G.add(query_dataframe_A, rank=0, shape='cylinder', color='lightblue', output_alias='df_B')()  # output_alias
+	df2 = G.add(query_dataframe_B, rank=0, shape='cylinder', color='lightblue', output_alias='df_A')()
+	new_df1 = G.add(product_transform, method_alias='my_b_transf')(df1)  # method_alias
+	new_df2 = G.add(product_transform, method_alias='my_a_transf')(df2)
+	dfa, dfb = G.add(split_transform, n_out=2, output_alias=['first_out', 'second_out'])(new_df2)  # plural output_alias 
+	joined_df = G.add(join_transform)(new_df1, dfa)
+	G.add(save_data)(dfb)
+	G.add(save_data)(joined_df)
+
+	graph_attributes = {'graph_ranksep': 0.25}
+	G.view(summary=False, graph_attributes=graph_attributes)
+
+.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/aliasGraph.png
+   :width: 10pt
+
+
+The default alias for operation node is the String name of the method being passed in, and the default alias for data node is simply "data".
 
 
 No output methods
@@ -380,5 +401,5 @@ To persist parts of the data, you can specify the ``persist`` parameter at ``add
 
 Then, when you run ``a4.get()`` it will not rerun the computation as ``a4`` result has been cached in memory although all other intermediate results will have been released.  
 
-At last, we can understand the difference between ``run()`` and ``run(a1, a3)``. Even if you don't persist anything, either at the graph level or the node level, by passing in the ``a1, a3``, the graph will automatically persist their data for you. So when you call ``get`` on ``a1 and a3``, after the graph is run, there won't be any recalculations, as the data have been persisted in those data nodes. 
+At last, we can understand the difference between ``run()`` and ``run(a1, a3)``. Even if you don't persist anything, either at the graph level or the node level, by passing in the ``a1, a3``, the graph will automatically persist their data for you. So when you call ``get`` on ``a1 and a3``, after the graph is run, there won't be any recalculations, as the data have been persisted in those data nodes. The rest of data nodes are subject to the same immediate memory release mechanism. 
 
