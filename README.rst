@@ -363,6 +363,8 @@ You will see:
 
 In this case, since ``return2_4`` is not activated, the ``data_3`` does not consider its presence in deciding release of memory. 
 
+On the other hand, ``run`` method will activate *all* operation nodes. This will make sure that even the operation nodes that do not have children are ran. However, the immediate memory release mechanism still applies to ``run`` method, unless otherwise specified. Refer below. 
+
 Memory persistance with Pyflow
 ------------------------------
 
