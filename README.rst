@@ -209,7 +209,7 @@ Finally, you can set the alias of the nodes by passing in ``method_alias`` and/o
 	graph_attributes = {'graph_ranksep': 0.25}
 	G.view(summary=False, graph_attributes=graph_attributes)
 
-.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/aliasGraph.png
+.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/aliasGraphs.png
    :width: 10pt
 
 
