@@ -196,22 +196,18 @@ Finally, you can set the alias of the nodes by passing in ``method_alias`` and/o
 .. code:: python
 
 	G = GraphBuilder()
-	df1 = G.add(query_dataframe_A, rank=0, shape='cylinder', color='lightblue', output_alias='df_B')()  
-	# output_alias
+	df1 = G.add(query_dataframe_A, rank=0, shape='cylinder', color='lightblue', output_alias='df_B')()
 	df2 = G.add(query_dataframe_B, rank=0, shape='cylinder', color='lightblue', output_alias='df_A')()
-	new_df1 = G.add(product_transform, method_alias='my_b_transf')(df1)  
-	# method_alias
+	new_df1 = G.add(product_transform, method_alias='my_b_transf')(df1)
 	new_df2 = G.add(product_transform, method_alias='my_a_transf')(df2)
-	dfa, dfb = G.add(split_transform, n_out=2, output_alias=['first_out', 'second_out'])(new_df2)  
-	# plural output_alias 
-	joined_df = G.add(join_transform)(new_df1, dfa)
-	G.add(save_data)(dfb)
-	G.add(save_data)(joined_df)
+	# note the list of alias for n_out = 2
+	dfa, dfb = G.add(split_transform, n_out=2, output_alias=['first_out', 'second_out'])(new_df2)
+	joined_df = G.add(join_transform, output_alias='final_data')(new_df1, dfa)
 
 	graph_attributes = {'graph_ranksep': 0.25}
 	G.view(summary=False, graph_attributes=graph_attributes)
 
-.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/aliasGraphs.png
+.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/aliasGraph.png
    :width: 10pt
 
 
