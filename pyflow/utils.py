@@ -3,6 +3,7 @@ import copy
 import os
 import ast
 import inspect
+import textwrap
 
 from graphviz import Digraph
 
@@ -21,7 +22,8 @@ class ExtendedRef(weakref.ref):
         return self().has_value()
     
 def contains_return_statement(func):
-    func_source_tree = ast.walk(ast.parse(inspect.getsource(func)))
+    func = textwrap.dedent(inspect.getsource(func))
+    func_source_tree = ast.walk(ast.parse(func))
     return any(isinstance(node, ast.Return) for node in func_source_tree)
 
 def get_rank(node_properties_dict):
