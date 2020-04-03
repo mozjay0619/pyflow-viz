@@ -146,7 +146,7 @@ In the above code, we added a ``wrong_method`` by mistake, and it needs to be re
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/remove2.png
    :width: 17pt
 
-As you can see, you will simply have added the correct node, but the original wrong method is not removed. In such a situation, we need to first remove the wrong node by invoking ``remove`` method. The ``remove`` method will erase the last operation node that was added. Let's go back to where we were right after adding ``wrong_method``. At this point, call ``remove``:
+As you can see, you will simply have added the correct node without removing the original wrong method. In such a situation, we need to first remove the wrong node by invoking ``remove`` method. The ``remove`` method will erase the last operation node that was added. Let's go back to where we were right after adding ``wrong_method``. At this point, call ``remove``:
 
 .. code:: python
 	
