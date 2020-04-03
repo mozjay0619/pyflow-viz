@@ -180,22 +180,83 @@ class GraphBuilder():
 
         requested_data_node_uids = [elem().node_uid for elem in args]
         
-        requested_data_nodes_dict = {k: v for k, v in self.strong_ref_dict.items() 
-                                     if v.node_uid in requested_data_node_uids}
+        requested_data_nodes = [(k, v) for k, v in self.strong_ref_dict.items() 
+                                     if v.node_uid in requested_data_node_uids]
         
-        for k, v in requested_data_nodes_dict.items():
+        for k, v in requested_data_nodes:
             v.persist()
         
-        op_nodes_dict = {k: v for k, v in self.strong_ref_dict.items() if v.node_type == 'operation'}
+        op_nodes = [(k, v) for k, v in self.strong_ref_dict.items() if v.node_type == 'operation']
 
-        for k, v in op_nodes_dict.items():
+        for k, v in op_nodes:
             v.activate()
         
-        for k, v in op_nodes_dict.items():
+        for k, v in op_nodes:
             v.run()
         
         return args
 
+    def remove(self, n=1):
+
+        op_nodes = [(k, v) for k, v in self.strong_ref_dict.items() if v.node_type == 'operation']
+        rev_op_nodes = op_nodes[::-1]
+        rev_op_nodes = rev_op_nodes[:n]
+
+        for k, v in rev_op_nodes:
+
+            # first get all the children nodes of the op node
+            child_data_node_uids = self.graph_dict[k]['children']
+            
+            # remove the child data nodes 
+            # no need to unlink them from its parent op node since
+            # all data node has only one parent op node (i.e. k)
+            for child_data_node_uid in child_data_node_uids:
+                
+                # remove from graph dict
+                self.graph_dict.pop(child_data_node_uid)
+                
+                # remove the strong reference from memory
+                del self.strong_ref_dict[child_data_node_uid]
+
+                self.node_count -= 1
+            
+            # get all the parent data nodes of the op node
+            parent_data_node_uids = self.graph_dict[k]['parents']
+            
+            # unlink the current op node (i.e. k) from its parent 
+            # data nodes
+            for parent_data_node_uid in parent_data_node_uids:
+                
+                # if the parent data node is raw input, remove it
+                if len(self.graph_dict[parent_data_node_uid]['parents']) == 0:
+                    
+                    # remove from graph dict
+                    self.graph_dict.pop(parent_data_node_uid)
+                    
+                    # emove the strong reference from memory
+                    del self.strong_ref_dict[parent_data_node_uid]
+
+                    self.node_count -= 1
+                    
+                    continue
+                    
+                # unlink from parent data node in graph dict
+                old_child_node_uids = self.graph_dict[parent_data_node_uid]['children']
+                new_child_node_uids = [elem for elem in old_child_node_uids if elem != k]
+                self.graph_dict[parent_data_node_uid]['children'] = new_child_node_uids
+                
+                # unlink from parent data node in memory
+                self.strong_ref_dict[parent_data_node_uid].remove_child_node(self.strong_ref_dict[parent_data_node_uid])
+                self.strong_ref_dict[parent_data_node_uid].remove_child_node(v)
+                
+            # remove the op node from graph dict
+            self.graph_dict.pop(k)
+            
+            # remove the strong reference to it
+            del self.strong_ref_dict[k]
+
+            self.node_count -= 1
+            
     @property
     def graph_attributes(self):
 

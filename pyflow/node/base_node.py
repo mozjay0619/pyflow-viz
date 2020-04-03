@@ -14,6 +14,14 @@ class BaseNode(object):
         
         self.parent_node_weak_refs = []
         self.child_node_weak_refs = []
+
+    def remove_child_node(self, node_strong_ref):
+
+        self.child_node_weak_refs = [elem for elem in self.child_node_weak_refs if elem()!=node_strong_ref]
+
+    def remove_parent_node(self, node_strong_ref):
+
+        self.parent_node_weak_refs = [elem for elem in self.parent_node_weak_refs if elem()!=node_strong_ref]
         
     def has_parent_node_weak_refs(self):
 
@@ -43,7 +51,6 @@ class BaseNode(object):
         all data nodes needed that has no values,
         all op until valued data nodes
         """
-
         for parent_node_weak_ref in self.get_parent_node_weak_refs():
 
             if parent_node_weak_ref().node_type == 'data' and parent_node_weak_ref().has_value():

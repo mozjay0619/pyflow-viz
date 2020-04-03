@@ -108,6 +108,63 @@ The ``view`` function actually has the ability to summarize the DAG by only show
 With the summary functionality turned off, the complete DAG visualization will includes ``DataNodes`` as well as the ``OperationNodes``. 
 
 
+Removing methods
+----------------
+
+When constructing a graph during an interactive session using tools like Jupyter Notebook, often there is a need to remove an operation node in order to correct for mistakes. You can achieve that by calling ``remove`` method. Let's look at an example.
+
+.. code:: python
+
+	from pyflow import GraphBuilder
+
+	def adding(x, y):
+		return x + y
+
+	def wrong_method(x, r):
+		return x + r
+
+	def correct_method(x, r):
+		return x*r
+
+	G = GraphBuilder(verbose=False)
+	a = G.add(adding)(1, 2)
+	b = G.add(wrong_method)(a, 1)  # added wrong method!
+
+	G.view(summary=False)
+
+.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/remove1.png
+   :width: 17pt
+
+In the above code, we added a ``wrong_method`` by mistake, and it needs to be replaced by ``correct_method``. If we just add the correct method on top, we will simply end up creating another node:
+	
+.. code:: python
+
+	b = G.add(correct_method)(a)  # can't just add correct_method node!
+
+	G.view(summary=False)
+
+As you can see, you will simply have added the correct node, but the original wrong method is not removed. In such a situation, we need to first remove the wrong node by invoking ``remove`` method. The ``remove`` method will erase the last operation node that was added. Let's go back to where we were right after adding ``wrong_method``. At this point, call ``remove``:
+
+.. code:: python
+	
+	G.remove()
+
+	G.view(summary=False)
+
+As you can see, the last operation node is now gone. ``remove`` method will also remove all children data node (thereby releasing their memory) that depends on that node. Also, it will remove all data node that holds any raw input that were fed into the operation node. It will not, however, remove any other part of the graph. 
+
+At this point, we can add the corrected version of the method:
+
+.. code:: python
+
+	b = G.add(correct_method)(a)
+
+	G.view(summary=False)
+
+On a more technical note, even though there is variable ``b``, ``remove`` can still release the memory of all the associated nodes because Pyflow operates on weak references. Pyflow keeps only one strong reference per node inside the GraphBuilder class instance (i.e. ``strong_ref_dict``). To check this, simply check ``b`` variable upon invoking ``remove``. You will see that ``b`` is now a dead (weak) reference that does not point to any particular Python object in memory. 
+
+
+
 Styling your DAG
 ----------------
 
