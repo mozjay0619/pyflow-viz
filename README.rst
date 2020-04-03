@@ -89,7 +89,7 @@ What if we have a python function with multiple outputs? Due to dynamic nature o
 
 	G.view()
 
-.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/multiout.png
+.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/multiout_.png
    :width: 17pt
 
 
@@ -102,7 +102,7 @@ The ``view`` function actually has the ability to summarize the DAG by only show
 
 	G.view(summary=False)
 
-.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/summary_false.png
+.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/summary_false_.png
    :width: 17pt
 
 With the summary functionality turned off, the complete DAG visualization will includes ``DataNodes`` as well as the ``OperationNodes``. 
