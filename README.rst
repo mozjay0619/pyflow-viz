@@ -139,9 +139,12 @@ In the above code, we added a ``wrong_method`` by mistake, and it needs to be re
 	
 .. code:: python
 
-	b = G.add(correct_method)(a)  # can't just add correct_method node!
+	b = G.add(correct_method)(a, 1)  # can't just add correct_method node!
 
 	G.view(summary=False)
+
+.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/remove2.png
+   :width: 17pt
 
 As you can see, you will simply have added the correct node, but the original wrong method is not removed. In such a situation, we need to first remove the wrong node by invoking ``remove`` method. The ``remove`` method will erase the last operation node that was added. Let's go back to where we were right after adding ``wrong_method``. At this point, call ``remove``:
 
@@ -151,19 +154,25 @@ As you can see, you will simply have added the correct node, but the original wr
 
 	G.view(summary=False)
 
+.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/remove3.png
+   :width: 17pt
+
 As you can see, the last operation node is now gone. ``remove`` method will also remove all children data node (thereby releasing their memory) that depends on that node. Also, it will remove all data node that holds any raw input that were fed into the operation node. It will not, however, remove any other part of the graph. 
 
 At this point, we can add the corrected version of the method:
 
 .. code:: python
 
-	b = G.add(correct_method)(a)
+	b = G.add(correct_method)(a, 1)
 
 	G.view(summary=False)
 
+.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/remove4.png
+   :width: 17pt
+
 On a more technical note, even though there is variable ``b``, ``remove`` can still release the memory of all the associated nodes because Pyflow operates on weak references. Pyflow keeps only one strong reference per node inside the GraphBuilder class instance (i.e. ``strong_ref_dict``). To check this, simply check ``b`` variable upon invoking ``remove``. You will see that ``b`` is now a dead (weak) reference that does not point to any particular Python object in memory. 
 
-
+Lastly, you can pass in ``n`` argument to ``remove`` method. This will remove the last ``n`` operation nodes. The default value is 1, i.e. it removes the latest 1 operation node. 
 
 Styling your DAG
 ----------------
