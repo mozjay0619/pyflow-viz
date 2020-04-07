@@ -360,6 +360,9 @@ When the computation graph becomes too big, the size of the visualized graph can
 
 	G.view()
 
+.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/grafting1.png
+   :width: 10pt
+
 In the above code, we have created one graph. But we can create another graph, and graft the ``First Graph`` graph to the new graph:
 
 .. code:: python
