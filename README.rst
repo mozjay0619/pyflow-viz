@@ -366,8 +366,9 @@ When the computation graph becomes too big, the size of the visualized graph can
 Let's look at the unsummarized version to take notice of the output_alias of the last data node:
 
 .. code:: python
-
-	G.view(summary=False, graph_attributes={'graph_ranksep': 0.3})  # let's make it a little shorter with ranksep parameter we talked about earlier!
+	
+	# let's make it a little shorter with ranksep parameter we talked about earlier!
+	G.view(summary=False, graph_attributes={'graph_ranksep': 0.3})
 
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/grafting15.png
    :width: 10pt
