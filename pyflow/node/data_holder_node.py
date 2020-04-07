@@ -2,8 +2,8 @@ from .base_node import BaseNode
 
 class DataHolderNode(BaseNode):
     
-    def __init__(self, node_uid, value=None, verbose=False):
-        super(DataHolderNode, self).__init__(node_uid, 'data_holder', verbose)
+    def __init__(self, graph_uid, graph_alias, node_uid, value=None, verbose=False):
+        super(DataHolderNode, self).__init__(graph_uid, graph_alias, node_uid, 'data_holder', verbose)
 
         self.value = value
         

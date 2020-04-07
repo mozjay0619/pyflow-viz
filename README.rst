@@ -340,6 +340,44 @@ Pyflow will create graph accordingly, such that the outputless operation node is
 
 This is a more realistic shape of the DAG in the actual use case of data preprocessing. Also, this is why ``run`` method makes more sense to use then ``get`` method in most realistic use cases. As you can see above, there is no data node from which we can call ``get`` method to retrieve the data. We are not interested in the data per se as we are in what we can do with the data. And most of the time, when we do something with our data, the end result is not another data. This does not mean you shouldn't use ``get``. There might be situations where you would want to get the data back, especially during interactive sessions. 
 
+
+Grafting graphs together
+------------------------
+
+When the computation graph becomes too big, the size of the visualized graph can actually end up becoming a hinderance to clean data flow documentation. Not only that, we could also benefit at the conceptual code organization level, if we had the ability to define multiple graphs and combine them together flexibly. I.e. we could treat a graph as if it was just another operation node. As of version ``0.7``, we can do this. Let's look at an example:
+
+.. code:: python
+
+	from pyflow import GraphBuilder
+
+	def adding(a, b):
+		return a+b
+
+	G = GraphBuilder(alias='First Graph')  # notice alias at graph level!
+	a1 = G.add(adding)(1, 2)
+	a2 = G.add(adding)(a1, 2)
+	a3 = G.add(adding, output_alias='leaving!')(a1, a2)
+
+	G.view()
+
+In the above code, we have created one graph. But we can create another graph, and graft the ``First Graph`` graph to the new graph:
+
+.. code:: python
+
+	H = GraphBuilder(alias='Second Graph')
+
+	b1 = H.add(adding)(1, 3)
+	b2 = H.add(adding)(b1, a3)
+	b3 = H.add(adding)(b1, b2)
+
+	H.view(summary=False)  # notice that the output_alias from previous graph is also preserved! 
+
+.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/grafting2.png
+   :width: 10pt
+
+As you can see, the previous graph is now summarized into a box. You can combine as many graphs in this way as you want. Despite this visual effect, ``b3`` is now part of one single big combined computation graph. Therefore, calling ``b3.get()`` will trigger computations in nodes that belong to both ``G`` and ``H`` as long as they are needed. As far as computation is concerned, you just have one big graph. 
+
+
 Saving your DAG image
 ---------------------
 

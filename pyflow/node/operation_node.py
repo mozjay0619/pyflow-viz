@@ -2,8 +2,8 @@ from .base_node import BaseNode
 
 class OperationNode(BaseNode):
     
-    def __init__(self, node_uid, function, n_out, verbose=False, alias=None):
-        super(OperationNode, self).__init__(node_uid, 'operation', verbose, alias or function.__name__)
+    def __init__(self, graph_uid, graph_alias, node_uid, function, n_out, verbose=False, alias=None):
+        super(OperationNode, self).__init__(graph_uid, graph_alias, node_uid, 'operation', verbose, alias or function.__name__)
         
         self.function = function
         self.n_out = n_out

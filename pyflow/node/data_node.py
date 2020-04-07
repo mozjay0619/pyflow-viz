@@ -6,11 +6,14 @@ import warnings
 
 class DataNode(BaseNode):
     
-    def __init__(self, node_uid, value=None, persist=False, verbose=False, alias=None):
-        super(DataNode, self).__init__(node_uid, 'data', verbose, alias or 'data')
+    def __init__(self, graph_uid, graph_alias, node_uid, value=None, persist=False, verbose=False, alias=None):
+        super(DataNode, self).__init__(graph_uid, graph_alias, node_uid, 'data', verbose, alias or 'data')
         
-        self.value_holder = DataHolderNode(self.node_uid, value, self.verbose)
+        self.value_holder = DataHolderNode(graph_uid, graph_alias, self.node_uid, value, self.verbose)
+
         self.data_persist = persist
+        self.graph_uid = graph_uid
+        self.graph_alias = graph_alias
 
     def set_value(self, value):
         
@@ -29,6 +32,9 @@ class DataNode(BaseNode):
         return self.data_persist
 
     def get(self):
+
+        # this is to support the multi-graph paradigm
+        self.remove_dead_child_nodes()
         
         if self.value_holder.has_value():
             return self.value_holder.get()
@@ -83,6 +89,6 @@ class DataNode(BaseNode):
             warnings.warn("You are releasing a DataNode that was persisted!", RuntimeWarning)
         
         del self.value_holder
-        self.value_holder = DataHolderNode(self.node_uid, None, self.verbose)
+        self.value_holder = DataHolderNode(self.graph_uid, self.graph_alias, self.node_uid, None, self.verbose)
         
         

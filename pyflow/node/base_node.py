@@ -1,7 +1,9 @@
 class BaseNode(object):
     
-    def __init__(self, node_uid, node_type, verbose, alias=None, *args, **kwargs):
+    def __init__(self, graph_uid, graph_alias, node_uid, node_type, verbose, alias=None, *args, **kwargs):
         
+        self.graph_uid = graph_uid
+        self.graph_alias = graph_alias
         self.node_uid = node_uid
         self.alias = alias
         
@@ -22,6 +24,14 @@ class BaseNode(object):
     def remove_parent_node(self, node_strong_ref):
 
         self.parent_node_weak_refs = [elem for elem in self.parent_node_weak_refs if elem()!=node_strong_ref]
+
+    def remove_dead_child_nodes(self):
+
+        self.child_node_weak_refs = [elem for elem in self.child_node_weak_refs if elem() is not None]
+
+    def remove_dead_parent_nodes(self):
+
+        self.parent_node_weak_refs = [elem for elem in self.parent_node_weak_refs if elem() is not None]
         
     def has_parent_node_weak_refs(self):
 
