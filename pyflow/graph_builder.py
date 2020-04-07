@@ -5,6 +5,7 @@ from .utils import view_full
 from .utils import view_summary
 from .utils import save_graph_image
 from .utils import contains_return_statement
+from .utils import topological_sort
 
 from collections import defaultdict
 from collections import Iterable
@@ -15,8 +16,11 @@ MAX_INTEGER = sys.maxsize  # for python3 only need sys.maxint for python2
 
 class GraphBuilder():
     
-    def __init__(self, persist=False, verbose=False):
-        
+    def __init__(self, persist=False, verbose=False, alias=None):
+
+        self.graph_alias = alias or "graph"
+        self.graph_uid = "{}_{}".format(self.graph_alias, id(self))
+
         self.persist = persist
         self.verbose = verbose
         
@@ -31,7 +35,11 @@ class GraphBuilder():
             'op_node_fontsize': 12,
             'op_node_shape': 'ellipse',
             'op_node_color': 'white',
-            'graph_ranksep': 0.475
+            'graph_ranksep': 0.475,
+            'graph_node_fontsize': 12.85,
+            'graph_node_shape': 'box3d',
+            'graph_node_color': 'white',
+            'graph_node_shapesize': 0.574
         }
         self.user_defined_graph_attributes = None
     
@@ -69,19 +77,24 @@ class GraphBuilder():
         else:
             op_node_uid = '{}_{}'.format(self.func.__name__, self.node_count)
 
-        self.strong_ref_dict[op_node_uid] = OperationNode(op_node_uid, self.func, self.n_out, 
-                                                          verbose=self.verbose, alias=self.method_alias)
+        self.strong_ref_dict[op_node_uid] = OperationNode(
+            self.graph_uid, self.graph_alias, op_node_uid, 
+            self.func, self.n_out, 
+            verbose=self.verbose, alias=self.method_alias)
         op_node_weak_ref = ExtendedRef(self.strong_ref_dict[op_node_uid])
         
         node_graph_attributes_dict = {'rank': self.rank, 
                                       'color': self.color, 
                                       'shape': self.shape,
-                                      'fontsize': self.fontsize}
+                                      'fontsize': self.fontsize,
+                                      'shapesize': None}
         op_node_properties_dict = {'children': [], 
                                    'parents': [], 
                                    'type': 'operation', 
                                    'alias': op_node_weak_ref().alias,
-                                   'uid': op_node_weak_ref().node_uid,
+                                   'node_uid': op_node_weak_ref().node_uid,
+                                   'graph_alias': self.graph_alias,
+                                   'graph_uid': op_node_weak_ref().graph_uid,
                                    'attributes': node_graph_attributes_dict}
         self.graph_dict[op_node_uid] = op_node_properties_dict
         
@@ -89,6 +102,28 @@ class GraphBuilder():
         for i, inp in enumerate(args):
             
             if isinstance(inp, ExtendedRef) and isinstance(inp(), DataNode):
+
+                # check if this data node comes from a different graph
+                # if so, in order to avoid having duplicate node uids we need to
+                # give it another uid
+                # (duplicate node uid will lead to cyclic graph visualization)
+                if inp().graph_uid != self.graph_uid:
+
+                    node_graph_attributes_dict = {'rank': MAX_INTEGER, 
+                                                  'color': "red", 
+                                                  'shape': None,
+                                                  'fontsize': self.fontsize,
+                                                  'shapesize': None}
+                    node_properties_dict = {'children': [op_node_weak_ref().node_uid], 
+                                            'parents': [], 
+                                            'type': 'data',
+                                            'alias': inp().alias,
+                                            'node_uid': inp().node_uid,
+                                            'graph_alias': inp().graph_alias,
+                                            'graph_uid': inp().graph_uid,
+                                            'attributes': node_graph_attributes_dict}
+                    self.graph_dict[inp().graph_uid] = node_properties_dict
+
                 # this data node already exists in the graph dict
                 op_node_weak_ref().parent_node_weak_refs.append(inp)
                 op_node_weak_ref().parent_node_weak_refs[i] = inp
@@ -97,8 +132,10 @@ class GraphBuilder():
                 self.node_count += 1
                 parent_data_node_uid = 'data_{}'.format(self.node_count)
                 # if inp is raw value, we need to persist since we can't re-compute it from graph
-                self.strong_ref_dict[parent_data_node_uid] = DataNode(node_uid=parent_data_node_uid, 
-                                                                      persist=True, verbose=self.verbose)
+                self.strong_ref_dict[parent_data_node_uid] = DataNode(
+                    graph_uid=self.graph_uid, graph_alias=self.graph_alias, 
+                    node_uid=parent_data_node_uid, 
+                    persist=True, verbose=self.verbose)
                 data_node_weak_ref = ExtendedRef(self.strong_ref_dict[parent_data_node_uid])
                 
                 op_node_weak_ref().parent_node_weak_refs.append(data_node_weak_ref)
@@ -119,8 +156,10 @@ class GraphBuilder():
                 child_data_node_uid = 'data_{}'.format(self.node_count)
 
             persist_this_node = self.persist or self.func_persist
-            self.strong_ref_dict[child_data_node_uid] = DataNode(node_uid=child_data_node_uid, 
-                                                                 verbose=self.verbose, persist=persist_this_node, alias=self.output_alias[i])
+            self.strong_ref_dict[child_data_node_uid] = DataNode(
+                graph_uid=self.graph_uid, graph_alias=self.graph_alias,
+                node_uid=child_data_node_uid, 
+                verbose=self.verbose, persist=persist_this_node, alias=self.output_alias[i])
             data_node_weak_ref = ExtendedRef(self.strong_ref_dict[child_data_node_uid])
             op_node_weak_ref().child_node_weak_refs.append(data_node_weak_ref)
             
@@ -131,18 +170,30 @@ class GraphBuilder():
             
             parent_data_node_weak_ref().child_node_weak_refs.append(op_node_weak_ref)
             parent_data_node_uid = parent_data_node_weak_ref().node_uid
-            if parent_data_node_uid in self.graph_dict:
+
+            # here, because our parent data node is not in it, we will add again
+            # now, we don't want to change the node_uid of the data node object fromt he previous graph...
+            # just add another condition!
+
+            if parent_data_node_weak_ref().graph_uid != self.graph_uid:
+                self.graph_dict[op_node_uid]['parents'].append(parent_data_node_weak_ref().graph_uid)
+                continue
+                
+            elif parent_data_node_uid in self.graph_dict:
                 self.graph_dict[parent_data_node_uid]['children'].append(op_node_weak_ref().node_uid)
             else:
                 node_graph_attributes_dict = {'rank': MAX_INTEGER, 
                                               'color': None, 
                                               'shape': None,
-                                              'fontsize': self.fontsize}
+                                              'fontsize': self.fontsize,
+                                              'shapesize': None}
                 node_properties_dict = {'children': [op_node_weak_ref().node_uid], 
                                         'parents': [], 
                                         'type': 'data',
                                         'alias': parent_data_node_weak_ref().alias,
-                                        'uid': parent_data_node_weak_ref().node_uid,
+                                        'node_uid': parent_data_node_weak_ref().node_uid,
+                                        'graph_alias': self.graph_alias,
+                                        'graph_uid': parent_data_node_weak_ref().graph_uid,
                                         'attributes': node_graph_attributes_dict}
                 self.graph_dict[parent_data_node_uid] = node_properties_dict
                 
@@ -159,12 +210,15 @@ class GraphBuilder():
                 node_graph_attributes_dict = {'rank': MAX_INTEGER, 
                                               'color': None, 
                                               'shape': None,
-                                              'fontsize': self.fontsize}
+                                              'fontsize': self.fontsize,
+                                              'shapesize': None}
                 node_properties_dict = {'children': [], 
                                         'parents': [op_node_weak_ref().node_uid], 
                                         'type': 'data', 
                                         'alias': child_data_node_weak_ref().alias,
-                                        'uid': child_data_node_weak_ref().node_uid,
+                                        'node_uid': child_data_node_weak_ref().node_uid,
+                                        'graph_alias': self.graph_alias,
+                                        'graph_uid': child_data_node_weak_ref().graph_uid,
                                         'attributes': node_graph_attributes_dict}
                 self.graph_dict[child_data_node_uid] = node_properties_dict
                 
@@ -272,15 +326,52 @@ class GraphBuilder():
 
         return {k: str(v) for k, v in self.graph_attributes.items()}
 
+    def preprocess_graph_dict(self):
+        """
+        1. support for multi graph
+        - need to create a copy of graph dict so that we can give it an appendage of graph node
+        """
+
+        # return self.graph_dict
+
+        graph_dict = copy.deepcopy(self.graph_dict)
+        external_graphs_dict = {k: v for k, v in graph_dict.items() if v['graph_uid']!=self.graph_uid}
+
+        for k, v in external_graphs_dict.items():
+
+            node_graph_attributes_dict = {'rank': MAX_INTEGER, 
+                                          'color': self.graph_attributes['graph_node_color'], 
+                                          'shape': self.graph_attributes['graph_node_shape'],
+                                          'fontsize': self.graph_attributes['graph_node_fontsize'],
+                                          'shapesize': self.graph_attributes['graph_node_shapesize']}
+            op_node_properties_dict = {'children': [k], 
+                                       'parents': [], 
+                                       'type': 'operation', 
+                                       'alias': v['graph_alias'],
+                                       'node_uid': k + "_ghost",
+                                       'graph_alias': v['graph_alias'],
+                                       'graph_uid': v['graph_uid'],
+                                       'attributes': node_graph_attributes_dict}
+            
+            v['parents'].append(k+"_ghost")
+            graph_dict[k+"_ghost"] = op_node_properties_dict
+
+        sorted_graph_dict = topological_sort(graph_dict)
+        return sorted_graph_dict
+
     def view(self, summary=True, graph_attributes=None):
 
         if graph_attributes:  # need validity check here
             self.user_defined_graph_attributes = graph_attributes
+        else:
+            self.user_defined_graph_attributes = None  # I don't like this
+
+        preprocessed_graph_dict = self.preprocess_graph_dict()
         
         if summary:
-            return view_summary(self.graph_dict, self._graph_attributes(), verbose=self.verbose)
+            return view_summary(preprocessed_graph_dict, self._graph_attributes(), verbose=self.verbose)
         else:
-            return view_full(self.graph_dict, self._graph_attributes(), verbose=self.verbose)
+            return view_full(preprocessed_graph_dict, self._graph_attributes(), verbose=self.verbose)
 
     def save_view(self, summary=True, graph_attributes=None, dirpath=None, filename='digraph', fileformat='png'):
 

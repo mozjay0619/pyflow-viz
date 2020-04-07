@@ -71,7 +71,7 @@ def view_full(graph_dict, graph_attributes, verbose):
                 if v['type'] != 'operation':
                     continue
 
-                label = v['uid'] if verbose else v['alias']
+                label = v['node_uid'] if verbose else v['alias']
                 if v['attributes']['shape'] is not None:
                     shape = v['attributes']['shape']
                 else:
@@ -90,7 +90,7 @@ def view_full(graph_dict, graph_attributes, verbose):
                     height='0.0', width='0.0', fillcolor=color, style='filled')
 
                 for child in v['children']:
-                    label = graph_dict[child]['uid'] if verbose else graph_dict[child]['alias']
+                    label = graph_dict[child]['node_uid'] if verbose else graph_dict[child]['alias']
                     graph.node(
                         child, 
                         label=label,
@@ -100,7 +100,7 @@ def view_full(graph_dict, graph_attributes, verbose):
                     graph.edge(k, child)
 
                 for parent in v['parents']:
-                    label = graph_dict[parent]['uid'] if verbose else graph_dict[parent]['alias']
+                    label = graph_dict[parent]['node_uid'] if verbose else graph_dict[parent]['alias']
                     graph.node(
                         parent, 
                         label=label,
@@ -114,44 +114,54 @@ def view_full(graph_dict, graph_attributes, verbose):
         if v['type'] != 'operation':
             continue
         
-        label = v['uid'] if verbose else v['alias']
+        label = v['node_uid'] if verbose else v['alias']
 
         if v['attributes']['shape'] is not None:
-            shape = v['attributes']['shape']
+            shape = str(v['attributes']['shape'])
         else:
             shape = graph_attributes['op_node_shape']
 
         if v['attributes']['color'] is not None:
-            color = v['attributes']['color']
+            color = str(v['attributes']['color'])
         else:
             color = graph_attributes['op_node_color']
+
+        if v['attributes']['fontsize'] is not None:
+            fontsize = str(v['attributes']['fontsize'])
+        else:
+            fontsize = graph_attributes['op_node_fontsize']
+
+        if v['attributes']['shapesize'] is not None:
+            shapesize = str(v['attributes']['shapesize'])
+        else:
+            shapesize = '0.0'
 
         graph.node(
             k, 
             label=label, 
             shape=shape, 
-            fontsize=graph_attributes['op_node_fontsize'], 
-            height='0.0', width='0.0', fillcolor=color, style='filled')
+            fontsize=fontsize, 
+            height=shapesize, width=shapesize, fillcolor=color, style='filled')
 
         for child in v['children']:
-            label = graph_dict[child]['uid'] if verbose else graph_dict[child]['alias']
+            label = graph_dict[child]['node_uid'] if verbose else graph_dict[child]['alias']
             graph.node(
                 child,
                 label=label,
                 shape=graph_attributes['data_node_shape'], 
                 fontsize=graph_attributes['data_node_fontsize'], 
-                height='0.0', width='0.0')
+                height='0.0', width='0.0', fillcolor=color)
             graph.edge(k, child)
 
         for parent in v['parents']:
-            label = graph_dict[parent]['uid'] if verbose else graph_dict[parent]['alias']
+            label = graph_dict[parent]['node_uid'] if verbose else graph_dict[parent]['alias']
 
             graph.node(
                 parent, 
                 label=label,
                 shape=graph_attributes['data_node_shape'], 
                 fontsize=graph_attributes['data_node_fontsize'], 
-                height='0.0', width='0.0')
+                height='0.0', width='0.0', fillcolor=color)
             graph.edge(parent, k)
 
     return graph
@@ -180,7 +190,7 @@ def view_summary(graph_dict, graph_attributes, verbose):
                     op_graph_dict[k]['children'].append(child_op_node_uid)
 
     return view_full(op_graph_dict, graph_attributes, verbose)
-    
+
 def save_graph_image(graph, dirpath=None, filename=None, fileformat=None):
     
     graph.format = 'png' or fileformat
@@ -201,3 +211,30 @@ def save_graph_image(graph, dirpath=None, filename=None, fileformat=None):
     
     return img_filepath
     
+def _recursive_topological_sort(node_uid, graph_dict, stack, visited_flags):
+    
+    # we have visited this node
+    visited_flags[node_uid] = True
+    
+    for child_node_uid in graph_dict[node_uid]['children']:
+        if not visited_flags[child_node_uid]:
+            _recursive_topological_sort(child_node_uid, graph_dict, stack, visited_flags)
+        
+    stack.append(node_uid)
+    
+def topological_sort(graph_dict):
+    
+    stack = []
+    visited_flags = {k:False for k in graph_dict.keys()}
+
+    for node_uid in graph_dict.keys():
+        if not visited_flags[node_uid]:
+            _recursive_topological_sort(node_uid, graph_dict, stack, visited_flags)
+            
+    sorted_graph_dict = {}
+    while len(stack)>0:
+        node_uid = stack.pop()
+        sorted_graph_dict[node_uid] = graph_dict[node_uid]
+    
+    return sorted_graph_dict
+            
