@@ -5,6 +5,9 @@ from pyflow import GraphBuilder
 def adding(a, b):
     return a + b
 
+def multioutput_adding(a, b):
+    return a + b, a
+
 def test_simple_graph():
     """GraphBuilder instance taking raw inputs"""
 
@@ -75,5 +78,61 @@ def test_manual_memory_release():
     
     a3.release_memory()
     assert(~a3.has_value())
-    
+
+def test_multioutput_method_support():
+    """Test n_out > 1"""
+
+    G = GraphBuilder()
+    a1 = G.add(adding)(1, 2)
+    a2, a3 = G.add(multioutput_adding, n_out=2)(a1, 3)
+
+    assert(a2.get()==6)
+    assert(a3.get()==3)
+
+def test_node_removal():
+    """Test remove method"""
+
+    G = GraphBuilder()
+    a1 = G.add(adding)(1, 2)
+    a2 = G.add(adding)(a1, 2)
+    a3 = G.add(adding)(a1, a2)
+
+    G.remove()
+
+    assert(a1() is not None)
+    assert(a2() is not None)
+    assert(a3() is None)
+
+def test_node_removal():
+    """Test remove method with arguments"""
+
+    G = GraphBuilder()
+    a1 = G.add(adding)(1, 2)
+    a2 = G.add(adding)(a1, 2)
+    a3 = G.add(adding)(a1, a2)
+
+    G.remove(2)
+
+    assert(a1() is not None)
+    assert(a2() is None)
+    assert(a3() is None)
+
+def run_method():
+    """Test run method"""
+
+    G = GraphBuilder()
+    a1 = G.add(adding)(1, 2)
+    a2, a3 = G.add(multioutput_adding, n_out=2)(a1, 3)
+
+    G.run()
+
+    assert(~a1.has_value())
+    assert(a2.has_value())
+    assert(a3.has_value())
+
+
+
+
+
+
     
