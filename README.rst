@@ -60,10 +60,7 @@ You can also pass in data nodes to get the results back this way:
 
 .. code:: python
 
-	a1, a3 = G.run(a1, a3)  # will run all the operation nodes
-	a1.get(), a3.get()
-
-The difference between ``run()`` and ``run(a1, a3)`` will make more sense once we discuss the internal workings of Pyflow below. 
+	a1_result, a3_result = G.run(a1, a3)  # will run all the operation nodes
 
 
 Multi-output methods
@@ -521,5 +518,5 @@ To persist parts of the data, you can specify the ``persist`` parameter at ``add
 
 Then, when you run ``a4.get()`` it will not rerun the computation as ``a4`` result has been cached in memory although all other intermediate results will have been released.  
 
-At last, we can understand the difference between ``run()`` and ``run(a1, a3)``. Even if you don't persist anything, either at the graph level or the node level, by passing in the ``a1, a3``, the graph will automatically persist their data for you. So when you call ``get`` on ``a1 and a3``, after the graph is run, there won't be any recalculations, as the data have been persisted in those data nodes. The rest of data nodes are subject to the same immediate memory release mechanism. 
+At last, we can understand the difference between ``run()`` and ``run(a1, a3)``. Even if you don't persist anything, either at the graph level or the node level, by passing in the ``a1, a3``, the graph will automatically persist their data for you, and return the persisted data by internally invoking ``get()`` on the nodes ``a1, a3``. The rest of data nodes are subject to the same immediate memory release mechanism. 
 
