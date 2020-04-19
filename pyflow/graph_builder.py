@@ -24,7 +24,7 @@ class GraphBuilder():
         self.persist = persist
         self.verbose = verbose
         
-        self.node_count = -1
+        self.node_count = 0
         self.strong_ref_dict = {}
         self.graph_dict = defaultdict(dict)
 
@@ -68,8 +68,6 @@ class GraphBuilder():
 
         # Create/update the graph using doubly linked list data structure
 
-        self.node_count += 1  # add an op node to hold the input function method
-
         op_node_uid = '{}_{}'.format(self.method_alias or self.func.__name__, self.node_count)
 
         # create op node to hold the input function method
@@ -82,6 +80,7 @@ class GraphBuilder():
             verbose=self.verbose, 
             alias=self.method_alias)
         op_node_weak_ref = ExtendedRef(self.strong_ref_dict[op_node_uid])
+        self.node_count += 1  
 
         # create edge: parent data_nodes <--> op_node
         for i, inp in enumerate(args):
@@ -99,8 +98,6 @@ class GraphBuilder():
 
             # if the inp is raw data, and not another data node
             else:
-                
-                self.node_count += 1  # we add a data node to hold this raw input data
 
                 parent_data_node_uid = 'data_{}'.format(self.node_count)  # raw data has no alias
 
@@ -116,6 +113,7 @@ class GraphBuilder():
                     persist=persist_this_node, 
                     verbose=self.verbose)
                 data_node_weak_ref = ExtendedRef(self.strong_ref_dict[parent_data_node_uid])
+                self.node_count += 1
                 
                 # add the weak ref to the parent data node (newly created) to the op node's references
                 op_node_weak_ref().parent_node_weak_refs.append(data_node_weak_ref)
@@ -130,8 +128,6 @@ class GraphBuilder():
             # if the current method has no return statement, we do not want to create a child data node
             if not contains_return_statement(self.func):
                 continue
-            
-            self.node_count += 1  # we need to add a new data node to hold the results of this op_node computation
 
             child_data_node_uid = '{}_{}'.format(self.output_alias[i] or 'data', self.node_count)
 
@@ -145,10 +141,11 @@ class GraphBuilder():
                 verbose=self.verbose, 
                 persist=persist_this_node, 
                 alias=self.output_alias[i])
+            data_node_weak_ref = ExtendedRef(self.strong_ref_dict[child_data_node_uid])
+            self.node_count += 1  
 
             # give the (weak) reference of the above children data_node to the op_node so that
             # the current op_node points to the data_node
-            data_node_weak_ref = ExtendedRef(self.strong_ref_dict[child_data_node_uid])
             op_node_weak_ref().child_node_weak_refs.append(data_node_weak_ref)
 
             # add the weak reference of the current op node to the child data node's references
