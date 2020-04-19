@@ -2,7 +2,7 @@
 Pyflow-Viz
 ==========
 
-Pyflow is a light weight library that lets the user construct a memory efficient directed acyclic computation graph (DAG) that evaluates lazily. It can cache intermediate results, only compute the parts of the graph that has data dependency, and immediately release memory of data whose dependecy is no longer required. Pyflow is simple and light, built purely on Python using the weak references for memory management and doubly linked list data structure for DAG construction. 
+Pyflow is a light weight library that lets the user construct a memory efficient directed acyclic computation graph (DAG) that evaluates lazily. It can cache intermediate results, only compute the parts of the graph that has data dependency, and immediately release memory of data whose dependecy is no longer required. Pyflow is simple and light, built purely on Python, using the weak references for memory management and doubly linked list for DAG construction. 
 
 Unlike computation graph based engines such as Dask or PySpark, Pyflow is not meant to be a parallel data processor, or to change the way computation resources are used. Instead, it is meant to be a light weight tool for code organization in the form of DAG and for graph visualization that can be used on top of Dask or PySpark. It's computation graph logic relies on pure Python and not on any other heavy third party packages.
 
