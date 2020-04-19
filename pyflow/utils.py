@@ -7,6 +7,7 @@ import textwrap
 
 from graphviz import Digraph
 
+
 class ExtendedRef(weakref.ref):
 
     def get(self):

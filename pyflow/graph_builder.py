@@ -12,7 +12,8 @@ from collections import Iterable
 import sys
 import copy
 
-MAX_INTEGER = sys.maxsize  # for python3 only need sys.maxint for python2
+MAX_INTEGER = sys.maxsize  
+
 
 class GraphBuilder():
     
@@ -291,7 +292,10 @@ class GraphBuilder():
         for k, v in op_nodes:
             v.run()
         
-        return args
+        if len(args) == 1:
+            return args[0].get()
+        else:
+            return [arg.get() for arg in args]
 
     def remove(self, n=1):
 
@@ -330,8 +334,11 @@ class GraphBuilder():
                     # remove from graph dict
                     self.graph_dict.pop(parent_data_node_uid)
                     
-                    # emove the strong reference from memory
-                    del self.strong_ref_dict[parent_data_node_uid]
+                    # remove the strong reference from memory
+                    # if the parent data node was from a different graph, 
+                    # we don't want to release its memory
+                    if parent_data_node_uid in self.strong_ref_dict:
+                        del self.strong_ref_dict[parent_data_node_uid]
 
                     self.node_count -= 1
                     
@@ -387,6 +394,7 @@ class GraphBuilder():
                                           'shape': self.graph_attributes['graph_node_shape'],
                                           'fontsize': self.graph_attributes['graph_node_fontsize'],
                                           'shapesize': self.graph_attributes['graph_node_shapesize']}
+
             op_node_properties_dict = {'children': [k], 
                                        'parents': [], 
                                        'type': 'operation', 
@@ -425,5 +433,4 @@ class GraphBuilder():
         graph = self.view(summary, graph_attributes)
         img_filepath = save_graph_image(graph, dirpath, filename, fileformat)
         return img_filepath
-
 
