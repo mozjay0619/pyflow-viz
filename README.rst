@@ -60,7 +60,7 @@ You can also pass in data nodes to get the results back this way:
 
 .. code:: python
 
-	a1_result, a3_result = G.run(a1, a3)  # will run all the operation nodes
+	a1_result, a3_result = G.run(a1, a3)  # will run all the operation nodes, and return the result data values of a1, a3
 
 
 Multi-output methods
