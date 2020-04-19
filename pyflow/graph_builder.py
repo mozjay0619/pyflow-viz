@@ -90,9 +90,9 @@ class GraphBuilder():
             if isinstance(inp, ExtendedRef) and isinstance(inp(), DataNode):
 
                 # inp is already (a weak reference to) a data node
+
                 # add the weak ref to the parent data node to the op node's references
                 op_node_weak_ref().parent_node_weak_refs.append(inp)  
-                op_node_weak_ref().parent_node_weak_refs[i] = inp
 
                 # add the weak reference of the current op node to the parent data node's references 
                 inp().child_node_weak_refs.append(op_node_weak_ref)
@@ -115,10 +115,12 @@ class GraphBuilder():
                     verbose=self.verbose)
                 data_node_weak_ref = ExtendedRef(self.strong_ref_dict[parent_data_node_uid])
                 self.node_count += 1
+
+                # set the value of the new data node with the input inp value
+                data_node_weak_ref().set_value(inp)
                 
                 # add the weak ref to the parent data node (newly created) to the op node's references
                 op_node_weak_ref().parent_node_weak_refs.append(data_node_weak_ref)
-                op_node_weak_ref().parent_node_weak_refs[i]().set_value(inp)
 
                 # add the weak reference of the current op node to the parent data node's references 
                 data_node_weak_ref().child_node_weak_refs.append(op_node_weak_ref)
