@@ -520,3 +520,36 @@ Then, when you run ``a4.get()`` it will not rerun the computation as ``a4`` resu
 
 At last, we can understand the difference between ``run()`` and ``run(a1, a3)``. Even if you don't persist anything, either at the graph level or the node level, by passing in the ``a1, a3``, the graph will automatically persist their data for you, and return the persisted data by internally invoking ``get()`` on the nodes ``a1, a3``. The rest of data nodes are subject to the same immediate memory release mechanism. 
 
+In terms of the codes, these two are equivalent:
+
+.. code:: python
+
+	# run() with arguments:
+
+	from pyflow import GraphBuilder
+	
+	G = GraphBuilder()
+	a1 = G.add(adding)(1, 2)
+	a2 = G.add(adding)(a1, 3)
+	a3 = G.add(adding)(a2, a1)
+	
+	a1_val, a3_val = G.run(a1, a3)
+	
+
+	# run() without arguments:
+
+	G = GraphBuilder()
+	a1 = G.add(adding, persist=True)(1, 2)
+	a2 = G.add(adding)(a1, 3)
+	a3 = G.add(adding)(a2, a1)
+
+	G.run()
+
+	a1_val = a1.get()
+	a3_val = a3.get()
+
+
+
+
+
+
