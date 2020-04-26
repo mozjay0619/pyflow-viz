@@ -6,7 +6,7 @@ import warnings
 
 class DataNode(BaseNode):
     
-    def __init__(self, graph_uid, graph_alias, node_uid, value=None, persist=False, verbose=False, alias=None):
+    def __init__(self, graph_uid, graph_alias, node_uid, value=None, persist=False, verbose=False, alias=None, graph_dict=None):
         super(DataNode, self).__init__(graph_uid, graph_alias, node_uid, 'data', verbose, alias or 'data')
         
         self.value_holder = DataHolderNode(graph_uid, graph_alias, self.node_uid, value, self.verbose)
@@ -14,6 +14,8 @@ class DataNode(BaseNode):
         self.data_persist = persist
         self.graph_uid = graph_uid
         self.graph_alias = graph_alias
+
+        self.graph_dict = graph_dict
 
     def set_value(self, value):
         
@@ -37,6 +39,19 @@ class DataNode(BaseNode):
         self.remove_dead_child_nodes()
         
         if self.value_holder.has_value():
+
+            # update graph_dict 
+            # during a computation execution, the value_holder can hold transient data
+            # so we need to check that this data node is indeed persisted
+            # as well as actually has data
+            if self.is_persisted():
+                if self.verbose:
+                    print('persisted', self.node_uid)
+
+                data_dim = self.value_holder.get_data_dim_as_str()
+
+                self.graph_dict[self.node_uid]['data_dim'] = data_dim
+
             return self.value_holder.get()
         else:
             if self.verbose:
@@ -44,6 +59,16 @@ class DataNode(BaseNode):
             
             self.activate_dependency_op_nodes()
             self.parent_node_weak_refs[0]().run()
+
+            # update graph_dict
+            if self.is_persisted():
+                if self.verbose:
+                    print('persisted', self.node_uid)
+
+                data_dim = self.value_holder.get_data_dim_as_str()
+
+                self.graph_dict[self.node_uid]['data_dim'] = data_dim
+
             return self.value_holder.get()
 
     def activate_dependency_op_nodes(self):

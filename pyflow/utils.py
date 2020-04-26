@@ -73,22 +73,42 @@ def view_full(graph_dict, graph_attributes, verbose):
                     continue
 
                 label = v['node_uid'] if verbose else v['alias']
+
                 if v['attributes']['shape'] is not None:
-                    shape = v['attributes']['shape']
+                    shape = str(v['attributes']['shape'])
                 else:
                     shape = graph_attributes['op_node_shape']
+                # if v['attributes']['shape'] is not None:
+                #     shape = v['attributes']['shape']
+                # else:
+                #     shape = graph_attributes['op_node_shape']
 
                 if v['attributes']['color'] is not None:
-                    color = v['attributes']['color']
+                    color = str(v['attributes']['color'])
                 else:
                     color = graph_attributes['op_node_color']
-                    
+                # if v['attributes']['color'] is not None:
+                #     color = v['attributes']['color']
+                # else:
+                #     color = graph_attributes['op_node_color']
+
+                if v['attributes']['fontsize'] is not None:
+                    fontsize = str(v['attributes']['fontsize'])
+                else:
+                    fontsize = graph_attributes['op_node_fontsize']
+
+                if v['attributes']['shapesize'] is not None:
+                    shapesize = str(v['attributes']['shapesize'])
+                else:
+                    shapesize = '0.0'
+                            
                 subg.node(
                     k, 
                     label=label, 
                     shape=shape, 
-                    fontsize=graph_attributes['op_node_fontsize'], 
-                    height='0.0', width='0.0', fillcolor=color, style='filled')
+                    fontsize=fontsize, 
+                    # fontsize=graph_attributes['op_node_fontsize'], 
+                    height=shapesize, width=shapesize, fillcolor=color, style='filled')
 
                 for child in v['children']:
                     label = graph_dict[child]['node_uid'] if verbose else graph_dict[child]['alias']
@@ -115,6 +135,8 @@ def view_full(graph_dict, graph_attributes, verbose):
         if v['type'] != 'operation':
             continue
         
+        # determine the op node shape here
+
         label = v['node_uid'] if verbose else v['alias']
 
         if v['attributes']['shape'] is not None:
@@ -137,6 +159,11 @@ def view_full(graph_dict, graph_attributes, verbose):
         else:
             shapesize = '0.0'
 
+        if graph_attributes['persist_record_shape'] and v['is_persisted']:
+            shape = 'record'
+            data_dim = v['data_dim']
+            label = "{{{}|{}}}".format(label, data_dim)
+
         graph.node(
             k, 
             label=label, 
@@ -145,27 +172,74 @@ def view_full(graph_dict, graph_attributes, verbose):
             height=shapesize, width=shapesize, fillcolor=color, style='filled')
 
         for child in v['children']:
+
+            # determine the data node shape here
+
             label = graph_dict[child]['node_uid'] if verbose else graph_dict[child]['alias']
+
+
+            if graph_attributes['persist_record_shape'] and graph_dict[child]['is_persisted']:
+                shape = 'record'
+                data_dim = graph_dict[child]['data_dim']
+                label = "{{{}|{}}}".format(label, data_dim)
+
+            else:
+                shape = graph_attributes['data_node_shape']
+
             graph.node(
                 child,
                 label=label,
-                shape=graph_attributes['data_node_shape'], 
+                shape=shape, 
                 fontsize=graph_attributes['data_node_fontsize'], 
                 height='0.0', width='0.0', fillcolor=color)
             graph.edge(k, child)
 
         for parent in v['parents']:
+
             label = graph_dict[parent]['node_uid'] if verbose else graph_dict[parent]['alias']
+
+            if graph_attributes['persist_record_shape'] and graph_dict[parent]['is_persisted']:
+                shape = 'record'
+                data_dim = graph_dict[parent]['data_dim']
+                label = "{{{}|{}}}".format(label, data_dim)
+
+            else:
+                shape = graph_attributes['data_node_shape']
 
             graph.node(
                 parent, 
                 label=label,
-                shape=graph_attributes['data_node_shape'], 
+                shape=shape, 
                 fontsize=graph_attributes['data_node_fontsize'], 
                 height='0.0', width='0.0', fillcolor=color)
             graph.edge(parent, k)
 
     return graph
+
+# def view_summary(graph_dict, graph_attributes, verbose):
+    
+#     op_subgraphs = {k: v for k, v in graph_dict.items() if 'operation' == v['type']}
+#     data_subgraphs = {k: v for k, v in graph_dict.items() if 'data' == v['type']}
+
+#     op_graph_dict = copy.deepcopy(op_subgraphs)
+
+#     for k, v in op_graph_dict.items():
+#         v['children'] = []
+#         v['parents'] = []
+
+#     for k, v in op_subgraphs.items():
+
+#         for child_data_node_uid in v['children']:
+
+#             data_node_prop_dict = data_subgraphs[child_data_node_uid]
+
+#             for child_op_node_uid in data_node_prop_dict['children']:
+
+#                 if child_op_node_uid is not None:
+
+#                     op_graph_dict[k]['children'].append(child_op_node_uid)
+
+#     return view_full(op_graph_dict, graph_attributes, verbose)
 
 def view_summary(graph_dict, graph_attributes, verbose):
     
@@ -183,6 +257,12 @@ def view_summary(graph_dict, graph_attributes, verbose):
         for child_data_node_uid in v['children']:
 
             data_node_prop_dict = data_subgraphs[child_data_node_uid]
+
+            is_persisted = data_node_prop_dict['is_persisted']
+            data_dim = data_node_prop_dict['data_dim']
+            
+            op_graph_dict[k]['is_persisted'] = is_persisted
+            op_graph_dict[k]['data_dim'] = data_dim
 
             for child_op_node_uid in data_node_prop_dict['children']:
 
@@ -239,3 +319,6 @@ def topological_sort(graph_dict):
     
     return sorted_graph_dict
             
+def add_to_module_global_namespace(method, global_dict):
+
+    method.__globals__.update(global_dict)

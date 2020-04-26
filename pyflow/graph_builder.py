@@ -6,6 +6,7 @@ from .utils import view_summary
 from .utils import save_graph_image
 from .utils import contains_return_statement
 from .utils import topological_sort
+from .utils import add_to_module_global_namespace
 
 from collections import defaultdict
 from collections import Iterable
@@ -17,7 +18,7 @@ MAX_INTEGER = sys.maxsize
 
 class GraphBuilder():
     
-    def __init__(self, persist=False, verbose=False, alias=None):
+    def __init__(self, persist=False, verbose=False, alias=None, shared_args=dict()):
 
         self.graph_alias = alias or "graph"
         self.graph_uid = "{}_{}".format(self.graph_alias, id(self))
@@ -30,21 +31,28 @@ class GraphBuilder():
         self.graph_dict = defaultdict(dict)
 
         self.default_graph_attributes = {
-            'data_node_fontsize': 11, 
+            'data_node_fontsize': 10, 
             'data_node_shape': 'box',
             'data_node_color': None,
             'op_node_fontsize': 12,
-            'op_node_shape': 'ellipse',
+            'op_node_shape': 'box',
             'op_node_color': 'white',
             'graph_ranksep': 0.475,
             'graph_node_fontsize': 12.85,
             'graph_node_shape': 'box3d',
             'graph_node_color': 'white',
-            'graph_node_shapesize': 0.574
+            'graph_node_shapesize': 0.574,
+            'persist_record_shape': True
         }
         self.user_defined_graph_attributes = None
+
+        if not isinstance(shared_args, dict):
+            raise TypeError("shared_args must be a dictionary. Instead received {}".format(shared_args))
+        self.shared_args = shared_args
     
     def add(self, func, method_alias=None, output_alias=None, n_out=1, persist=False, rank=None, color=None, shape=None, fontsize=None):
+
+        add_to_module_global_namespace(func, self.shared_args)
         
         self.func = func
         self.method_alias = method_alias
@@ -79,7 +87,8 @@ class GraphBuilder():
             function=self.func, 
             n_out=self.n_out, 
             verbose=self.verbose, 
-            alias=self.method_alias)
+            alias=self.method_alias,
+            graph_dict=self.graph_dict)
         op_node_weak_ref = ExtendedRef(self.strong_ref_dict[op_node_uid])
         self.node_count += 1  
 
@@ -112,7 +121,8 @@ class GraphBuilder():
                     graph_alias=self.graph_alias, 
                     node_uid=parent_data_node_uid, 
                     persist=persist_this_node, 
-                    verbose=self.verbose)
+                    verbose=self.verbose,
+                    graph_dict=self.graph_dict)
                 data_node_weak_ref = ExtendedRef(self.strong_ref_dict[parent_data_node_uid])
                 self.node_count += 1
 
@@ -143,7 +153,8 @@ class GraphBuilder():
                 node_uid=child_data_node_uid, 
                 verbose=self.verbose, 
                 persist=persist_this_node, 
-                alias=self.output_alias[i])
+                alias=self.output_alias[i],
+                graph_dict=self.graph_dict)
             data_node_weak_ref = ExtendedRef(self.strong_ref_dict[child_data_node_uid])
             self.node_count += 1  
 
@@ -166,6 +177,8 @@ class GraphBuilder():
         op_node_properties_dict = {'children': [], 
                                    'parents': [], 
                                    'type': 'operation', 
+                                   'is_persisted': False,
+                                   'data_dim': '',
                                    'alias': op_node_weak_ref().alias,
                                    'node_uid': op_node_weak_ref().node_uid,
                                    'graph_alias': self.graph_alias,
@@ -194,6 +207,8 @@ class GraphBuilder():
                 node_properties_dict = {'children': [], 
                                         'parents': [],  
                                         'type': 'data',
+                                        'is_persisted': parent_data_node_weak_ref().is_persisted(),
+                                        'data_dim': '',
                                         'alias': parent_data_node_weak_ref().alias,
                                         'node_uid': _ext_node_uid,
                                         'graph_alias': parent_data_node_weak_ref().graph_alias,
@@ -223,6 +238,8 @@ class GraphBuilder():
                 node_properties_dict = {'children': [], 
                                         'parents': [], 
                                         'type': 'data',
+                                        'is_persisted': parent_data_node_weak_ref().is_persisted(),
+                                        'data_dim': '',
                                         'alias': parent_data_node_weak_ref().alias,
                                         'node_uid': parent_data_node_weak_ref().node_uid,
                                         'graph_alias': self.graph_alias,
@@ -253,6 +270,8 @@ class GraphBuilder():
                 node_properties_dict = {'children': [], 
                                         'parents': [], 
                                         'type': 'data', 
+                                        'is_persisted': child_data_node_weak_ref().is_persisted(),
+                                        'data_dim': '',
                                         'alias': child_data_node_weak_ref().alias,
                                         'node_uid': child_data_node_weak_ref().node_uid,
                                         'graph_alias': self.graph_alias,
