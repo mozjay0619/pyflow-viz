@@ -19,7 +19,7 @@ class DataHolderNode(BaseNode):
     def has_value(self):
         return self.value is not None
 
-    def get_data_dim_as_str(self):
+    def get_persisted_data_dim_as_str(self):
         """Currently supports dimensionality from:
 
         numpy ndarray
@@ -32,7 +32,7 @@ class DataHolderNode(BaseNode):
             raise ValueError("There is no value!")
 
         if hasattr(self.value, "rdd"):
-            row_cnt = self.get().count()
+            row_cnt = self.get().persist().count()
             col_cnt = len(self.get().columns)
             dim = (row_cnt, col_cnt)
 
@@ -50,4 +50,3 @@ class DataHolderNode(BaseNode):
     def __del__(self):
         if self.verbose:
             print('{} released!'.format(self.node_uid))
-

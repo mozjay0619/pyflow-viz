@@ -48,8 +48,7 @@ class DataNode(BaseNode):
                 if self.verbose:
                     print('persisted', self.node_uid)
 
-                data_dim = self.value_holder.get_data_dim_as_str()
-
+                data_dim = self.value_holder.get_persisted_data_dim_as_str()
                 self.graph_dict[self.node_uid]['data_dim'] = data_dim
 
             return self.value_holder.get()
@@ -65,8 +64,7 @@ class DataNode(BaseNode):
                 if self.verbose:
                     print('persisted', self.node_uid)
 
-                data_dim = self.value_holder.get_data_dim_as_str()
-
+                data_dim = self.value_holder.get_persisted_data_dim_as_str()
                 self.graph_dict[self.node_uid]['data_dim'] = data_dim
 
             return self.value_holder.get()
