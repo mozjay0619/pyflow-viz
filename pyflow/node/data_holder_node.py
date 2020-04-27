@@ -35,7 +35,7 @@ class DataHolderNode(BaseNode):
 
             print(self.value)
             print(self.get())
-            pritn(self.get().count())
+            print(self.get().count())
             print(self.value.count())
             print(self.value())
 
