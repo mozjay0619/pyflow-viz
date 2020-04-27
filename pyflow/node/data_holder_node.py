@@ -32,7 +32,7 @@ class DataHolderNode(BaseNode):
             raise ValueError("There is no value!")
 
         if hasattr(self.value, "rdd"):
-            dim = ((self.has_value.count(), len(self.has_value.columns)))
+            dim = ((self.value.count(), len(self.value.columns)))
 
         elif isinstance(self.value, np.ndarray):
             dim = self.value.shape
