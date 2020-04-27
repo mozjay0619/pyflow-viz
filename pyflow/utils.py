@@ -216,31 +216,6 @@ def view_full(graph_dict, graph_attributes, verbose):
 
     return graph
 
-# def view_summary(graph_dict, graph_attributes, verbose):
-    
-#     op_subgraphs = {k: v for k, v in graph_dict.items() if 'operation' == v['type']}
-#     data_subgraphs = {k: v for k, v in graph_dict.items() if 'data' == v['type']}
-
-#     op_graph_dict = copy.deepcopy(op_subgraphs)
-
-#     for k, v in op_graph_dict.items():
-#         v['children'] = []
-#         v['parents'] = []
-
-#     for k, v in op_subgraphs.items():
-
-#         for child_data_node_uid in v['children']:
-
-#             data_node_prop_dict = data_subgraphs[child_data_node_uid]
-
-#             for child_op_node_uid in data_node_prop_dict['children']:
-
-#                 if child_op_node_uid is not None:
-
-#                     op_graph_dict[k]['children'].append(child_op_node_uid)
-
-#     return view_full(op_graph_dict, graph_attributes, verbose)
-
 def view_summary(graph_dict, graph_attributes, verbose):
     
     op_subgraphs = {k: v for k, v in graph_dict.items() if 'operation' == v['type']}
