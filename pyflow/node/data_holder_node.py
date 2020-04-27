@@ -1,5 +1,8 @@
 from .base_node import BaseNode
 
+import numpy as np
+import pandas as pd
+
 class DataHolderNode(BaseNode):
     
     def __init__(self, graph_uid, graph_alias, node_uid, value=None, verbose=False):
@@ -15,6 +18,32 @@ class DataHolderNode(BaseNode):
     
     def has_value(self):
         return self.value is not None
+
+    def get_data_dim_as_str(self):
+        """Currently supports dimensionality from:
+
+        numpy ndarray
+        pandas dataframe
+        pyspark dataframe
+
+        The dimensionality of other types of data defaults to "(0)"
+        """
+        if not self.has_value:
+            raise ValueError("There is no value!")
+
+        if hasattr(self.value, "rdd"):
+            dim = ((self.has_value.count(), len(self.has_value.columns)))
+
+        elif isinstance(self.value, np.ndarray):
+            dim = self.value.shape
+
+        elif isinstance(self.value, pd.DataFrame):
+            dim = self.value.shape
+
+        else:
+            return("(1, )")
+
+        return str(dim)
         
     def __del__(self):
         if self.verbose:
