@@ -66,7 +66,11 @@ class GraphBuilder():
         if not output_alias:
             self.output_alias *= n_out
 
-        self.rank = rank or MAX_INTEGER
+        if rank is None:
+            self.rank = MAX_INTEGER
+        else:
+            self.rank = rank
+
         self.color = color
         self.shape = shape
         self.fontsize = fontsize
