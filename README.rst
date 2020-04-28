@@ -580,9 +580,20 @@ The empty box signifies that the graph is requested to persist that data, but it
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/record2.png
    :width: 10pt
 
+Now, of course, it is not the method that is being persisted but the resulting data of that op node. You can see this when you visualize the DAG with ``summary=False``:
 
+.. code:: python
 
+	G.run(summary=False)
 
+.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/record3.png
+   :width: 10pt
+
+Some notes:
+
+1. The op node with record box is a short hand way of conveying the message that the child data node of that op node will be persisted. 
+2. The raw data are automatically persisted, which is why you see the dimensionality information in the record box. This is because the raw user data inputs cannot be recomputed from the graph alone. But this will not be visible when ``summary=True``, because the op node will only show the record box for persisted child data node, and user supplied inputs will always be parent data node. 
+3. Also this is not made explicitly visible, the final leaf data node are always persisted when ``run`` method is invoked. But this will not be explicitly shown in the graph unless the user manually supplies ``persist`` flag at the ``add`` method invocation. 
 
 
 
