@@ -205,7 +205,7 @@ Pyflow lets the user customize the DAG visuals to a certain degree, with more to
 
 	G.view()
 
-.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/queryA.png
+.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/queryingA.png
    :width: 10pt
 
 But since at a conceptual level, queries are similarly progenitors of new data, perhaps we want to put them side by side on top, and position is controlled by ``rank`` parameter. Also, since these are probably coming from some data storage, we might want to style their nodes accordingly, with different color.
