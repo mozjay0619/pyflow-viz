@@ -234,7 +234,7 @@ But then we might want to make the DAG a little shorter, especially if we are to
 
 	G.view(graph_attributes=graph_attributes)
 
-.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/shorterGraph.png
+.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/shortGraph.png
    :width: 10pt
 
 You can take a look and play around with the rest of the configurations: 
