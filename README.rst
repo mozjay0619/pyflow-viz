@@ -364,7 +364,7 @@ When the computation graph becomes too big, the size of the visualized graph can
 
 	G.view()
 
-.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/grafting1.png
+.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/graft1.png
    :width: 10pt
 
 Let's look at the unsummarized version to take notice of the output_alias of the last data node:
