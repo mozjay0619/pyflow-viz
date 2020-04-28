@@ -196,31 +196,35 @@ class GraphBuilder():
         for parent_data_node_weak_ref in op_node_weak_ref().parent_node_weak_refs:
 
             # if the parent data node comes from a different graph
+            # the second condition is there to prevent detached op node when the previous
+            # graph result is used in more than 1 place.
             if parent_data_node_weak_ref().graph_uid != self.graph_uid:
 
                 _ext_node_uid = "{} from {}".format(
                     parent_data_node_weak_ref().node_uid, 
                     parent_data_node_weak_ref().graph_uid)
 
-                node_graph_attributes_dict = {'rank': MAX_INTEGER, 
-                                              'color': "red", 
-                                              'shape': None,
-                                              'fontsize': self.fontsize,
-                                              'shapesize': None}
+                if _ext_node_uid not in self.graph_dict:
 
-                node_properties_dict = {'children': [], 
-                                        'parents': [],  
-                                        'type': 'data',
-                                        'is_persisted': parent_data_node_weak_ref().is_persisted(),
-                                        'data_dim': '',
-                                        'alias': parent_data_node_weak_ref().alias,
-                                        'node_uid': _ext_node_uid,
-                                        'graph_alias': parent_data_node_weak_ref().graph_alias,
-                                        'graph_uid': parent_data_node_weak_ref().graph_uid,
-                                        'attributes': node_graph_attributes_dict}
+                    node_graph_attributes_dict = {'rank': MAX_INTEGER, 
+                                                  'color': "red", 
+                                                  'shape': None,
+                                                  'fontsize': self.fontsize,
+                                                  'shapesize': None}
 
-                # add the parent data node visualization attributes to the graph_dict
-                self.graph_dict[_ext_node_uid] = node_properties_dict  
+                    node_properties_dict = {'children': [], 
+                                            'parents': [],  
+                                            'type': 'data',
+                                            'is_persisted': parent_data_node_weak_ref().is_persisted(),
+                                            'data_dim': parent_data_node_weak_ref().get_persisted_data_dim_as_str(),
+                                            'alias': parent_data_node_weak_ref().alias,
+                                            'node_uid': _ext_node_uid,
+                                            'graph_alias': parent_data_node_weak_ref().graph_alias,
+                                            'graph_uid': parent_data_node_weak_ref().graph_uid,
+                                            'attributes': node_graph_attributes_dict}
+
+                    # add the parent data node visualization attributes to the graph_dict
+                    self.graph_dict[_ext_node_uid] = node_properties_dict
 
                 # make the parent data node point to the op node
                 self.graph_dict[_ext_node_uid]['children'].append(op_node_weak_ref().node_uid)
@@ -239,11 +243,16 @@ class GraphBuilder():
                                               'fontsize': self.fontsize,
                                               'shapesize': None}
 
+                if parent_data_node_weak_ref().has_value():
+                    data_dim = parent_data_node_weak_ref().get_persisted_data_dim_as_str()
+                else:
+                    data_dim = ''
+
                 node_properties_dict = {'children': [], 
                                         'parents': [], 
                                         'type': 'data',
                                         'is_persisted': parent_data_node_weak_ref().is_persisted(),
-                                        'data_dim': '',
+                                        'data_dim': data_dim,
                                         'alias': parent_data_node_weak_ref().alias,
                                         'node_uid': parent_data_node_weak_ref().node_uid,
                                         'graph_alias': self.graph_alias,
@@ -413,9 +422,6 @@ class GraphBuilder():
         1. support for multi graph
         - need to create a copy of graph dict so that we can give it an appendage of graph node
         """
-
-        # return self.graph_dict
-
         graph_dict = copy.deepcopy(self.graph_dict)
         external_graphs_dict = {k: v for k, v in graph_dict.items() if v['graph_uid']!=self.graph_uid}
 
@@ -435,7 +441,7 @@ class GraphBuilder():
                                        'graph_alias': v['graph_alias'],
                                        'graph_uid': v['graph_uid'],
                                        'attributes': node_graph_attributes_dict}
-            
+
             v['parents'].append(k+"_ghost")
             graph_dict[k+"_ghost"] = op_node_properties_dict
 
@@ -452,9 +458,9 @@ class GraphBuilder():
         preprocessed_graph_dict = self.preprocess_graph_dict()
         
         if summary:
-            return view_summary(preprocessed_graph_dict, self._graph_attributes(), verbose=self.verbose)
+            return view_summary(preprocessed_graph_dict, self._graph_attributes(), verbose=self.verbose, current_graph_uid=self.graph_uid)
         else:
-            return view_full(preprocessed_graph_dict, self._graph_attributes(), verbose=self.verbose)
+            return view_full(preprocessed_graph_dict, self._graph_attributes(), verbose=self.verbose, current_graph_uid=self.graph_uid)
 
     def save_view(self, summary=True, graph_attributes=None, dirpath=None, filename='digraph', fileformat='png'):
 
@@ -465,4 +471,3 @@ class GraphBuilder():
         graph = self.view(summary, graph_attributes)
         img_filepath = save_graph_image(graph, dirpath, filename, fileformat)
         return img_filepath
-

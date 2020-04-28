@@ -3,6 +3,7 @@ from .base_node import BaseNode
 import numpy as np
 import pandas as pd
 
+
 class DataHolderNode(BaseNode):
     
     def __init__(self, graph_uid, graph_alias, node_uid, value=None, verbose=False):

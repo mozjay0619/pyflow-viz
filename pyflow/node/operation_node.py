@@ -1,5 +1,6 @@
 from .base_node import BaseNode
 
+
 class OperationNode(BaseNode):
     
     def __init__(self, graph_uid, graph_alias, node_uid, function, n_out, verbose=False, alias=None, graph_dict=None):
@@ -116,4 +117,3 @@ class OperationNode(BaseNode):
                 parent_data_node_weak_ref().release_memory()
                 
         self.deactivate()
-
