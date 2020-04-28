@@ -222,7 +222,7 @@ But since at a conceptual level, queries are similarly progenitors of new data, 
 
 	G.view()
 
-.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/queryB.png
+.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/queryingB.png
    :width: 10pt
 
 
