@@ -577,7 +577,8 @@ The empty box signifies that the graph is requested to persist that data, but it
 
 	G.run()
 
-
+.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/record1.png
+   :width: 10pt
 
 
 
