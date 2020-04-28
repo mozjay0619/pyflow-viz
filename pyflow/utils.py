@@ -36,7 +36,7 @@ def get_type(node_properties_dict):
     node_type = node_properties_dict['type']
     return node_type
 
-def view_full(graph_dict, graph_attributes, verbose):
+def view_full(graph_dict, graph_attributes, verbose, current_graph_uid):
     
     ranks = set()
 
@@ -78,19 +78,11 @@ def view_full(graph_dict, graph_attributes, verbose):
                     shape = str(v['attributes']['shape'])
                 else:
                     shape = graph_attributes['op_node_shape']
-                # if v['attributes']['shape'] is not None:
-                #     shape = v['attributes']['shape']
-                # else:
-                #     shape = graph_attributes['op_node_shape']
 
                 if v['attributes']['color'] is not None:
                     color = str(v['attributes']['color'])
                 else:
                     color = graph_attributes['op_node_color']
-                # if v['attributes']['color'] is not None:
-                #     color = v['attributes']['color']
-                # else:
-                #     color = graph_attributes['op_node_color']
 
                 if v['attributes']['fontsize'] is not None:
                     fontsize = str(v['attributes']['fontsize'])
@@ -107,7 +99,6 @@ def view_full(graph_dict, graph_attributes, verbose):
                     label=label, 
                     shape=shape, 
                     fontsize=fontsize, 
-                    # fontsize=graph_attributes['op_node_fontsize'], 
                     height=shapesize, width=shapesize, fillcolor=color, style='filled')
 
                 for child in v['children']:
@@ -159,7 +150,11 @@ def view_full(graph_dict, graph_attributes, verbose):
         else:
             shapesize = '0.0'
 
-        if graph_attributes['persist_record_shape'] and v['is_persisted']:
+        # we added the condition to check that this op node belongs to the same graph
+        # this is so that we keep the graph_node_shape shape in the multi graph setting
+        # we do not add this condition for data node, which means we will see the 
+        # persist node shape shift when viewed with summary=False
+        if current_graph_uid==v['graph_uid'] and graph_attributes['persist_record_shape'] and v['is_persisted']:
             shape = 'record'
             data_dim = v['data_dim']
             label = "{{{}|{}}}".format(label, data_dim)
@@ -216,7 +211,7 @@ def view_full(graph_dict, graph_attributes, verbose):
 
     return graph
 
-def view_summary(graph_dict, graph_attributes, verbose):
+def view_summary(graph_dict, graph_attributes, verbose, current_graph_uid):
     
     op_subgraphs = {k: v for k, v in graph_dict.items() if 'operation' == v['type']}
     data_subgraphs = {k: v for k, v in graph_dict.items() if 'data' == v['type']}
@@ -245,7 +240,7 @@ def view_summary(graph_dict, graph_attributes, verbose):
 
                     op_graph_dict[k]['children'].append(child_op_node_uid)
 
-    return view_full(op_graph_dict, graph_attributes, verbose)
+    return view_full(op_graph_dict, graph_attributes, verbose, current_graph_uid)
 
 def save_graph_image(graph, dirpath=None, filename=None, fileformat=None):
     

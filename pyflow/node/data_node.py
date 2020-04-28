@@ -33,6 +33,13 @@ class DataNode(BaseNode):
         
         return self.data_persist
 
+    def get_persisted_data_dim_as_str(self):
+
+        if self.has_value():
+            return self.value_holder.get_persisted_data_dim_as_str()
+        else:
+            return ''
+
     def get(self):
 
         # this is to support the multi-graph paradigm
@@ -48,7 +55,7 @@ class DataNode(BaseNode):
                 if self.verbose:
                     print('persisted', self.node_uid)
 
-                data_dim = self.value_holder.get_persisted_data_dim_as_str()
+                data_dim = self.get_persisted_data_dim_as_str()
                 self.graph_dict[self.node_uid]['data_dim'] = data_dim
 
             return self.value_holder.get()
@@ -64,7 +71,7 @@ class DataNode(BaseNode):
                 if self.verbose:
                     print('persisted', self.node_uid)
 
-                data_dim = self.value_holder.get_persisted_data_dim_as_str()
+                data_dim = self.get_persisted_data_dim_as_str()
                 self.graph_dict[self.node_uid]['data_dim'] = data_dim
 
             return self.value_holder.get()
@@ -90,7 +97,6 @@ class DataNode(BaseNode):
         all data nodes needed that has no values,
         all op until valued data nodes
         """
-
         for parent_node_weak_ref in self.get_parent_node_weak_refs():
 
             if parent_node_weak_ref().node_type == 'data' and parent_node_weak_ref().has_value():
@@ -110,8 +116,9 @@ class DataNode(BaseNode):
         
         if self.is_persisted():
             warnings.warn("You are releasing a DataNode that was persisted!", RuntimeWarning)
+
+        self.graph_dict[self.node_uid]['data_dim'] = ''
         
         del self.value_holder
         self.value_holder = DataHolderNode(self.graph_uid, self.graph_alias, self.node_uid, None, self.verbose)
-        
         
