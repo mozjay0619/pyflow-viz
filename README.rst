@@ -151,7 +151,7 @@ As you can see, you will simply have added the correct node without removing the
 
 	G.view(summary=False)
 
-.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/remove3.png
+.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/removing3.png
    :width: 17pt
 
 As you can see, the last operation node is now gone. ``remove`` method will also remove all children data node (thereby releasing their memory) that depends on that node. Also, it will remove all data node that holds any raw input that were fed into the operation node. It will not, however, remove any other part of the graph. 
