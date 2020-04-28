@@ -407,89 +407,10 @@ You can easily save your DAG image by invoking ``save_view`` method, which retur
 The ``save_view`` method also has ``summary`` boolean parameter. You can also set the file name and file path by passing in ``dirpath`` and ``filename`` parameter. They default to current working directory and "digraph" respectively. You can also set the file format as png or pdf by setting ``fileformat`` parameter. The default is png. 
 
 
-Computation and memory efficiency of Pyflow (OUTDATED)
--------------------------------------------
-
-When you invoke ``get`` method, pyflow will only then evaluate, and it will evaluate only the parts of the graph that is needed to be evaluated. Also, as soon as an intermediate result has no dependency, it will automatically release the memory back to the operating system. Let's take a tour of the computation process to better understand this mechanism by turning on ``verbose`` parameter. 
-
-.. code:: python
-
-	from pyflow import GraphBuilder
-
-	def adding(a, b):
-		return a + b
-
-	def multi_output_method(a, b):
-		return a+1, b+1
-
-	G = GraphBuilder(verbose=True)  # set verbose to True
-	a1 = G.add(adding)(1, 2)
-	a2, a3 = G.add(return2, n_out=2)(a1, 3)
-	a4 = G.add(adding)(a1, 5)
-	a5 = G.add(adding)(a4, a3)
-
-	a5.get()
-
-With ``verbose=True``, along with the final output, pyflow will also produce the following standard output:
-
-::
-
-	computing for data_12
-	adding_11 activated!
-	adding_8 activated!
-	adding_0 activated!
-	return2_4 activated!
-	computing for data_10
-	computing for data_3
-	running adding_0
-	adding_0 deactivated!
-	running adding_8
-	data_3 still needed at return2_4
-	adding_8 deactivated!
-	computing for data_7
-	running return2_4
-	data_3 released!
-	return2_4 deactivated!
-	running adding_11
-	data_10 released!
-	data_7 released!
-	adding_11 deactivated!
-
-Let's take the tour of this process by looking at the graph. Notice that in verbose mode, the graph will actually print out the uid's of the nodes not just their aliases (more on setting alias later!)
-
-.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/verbose_.png
-   :width: 10pt
-
-As pyflow tries to compute ``data_12``, it will first activate all the ``OperationNodes`` that is needed for the computation, in our case, those are ``adding_11``, ``adding_8``, ``adding_0``, ``return2_4``. It will then follow the lineage of the graph to work on intermediate results needed to proceed down the graph. Notice that as the computation proceeds, the ``OperationNodes`` that were activated are deactivated. When it gets to ``data_3``, notice that it is needed at both ``adding_8`` and ``return2_4``. Thus, once it completes ``adding_8``, it cannot yet release the memory from ``data_3``: ``data_3 still needed at return2_4``. But as soon as ``return2_4`` is ran, it releases ``data_3`` from memory, as it is not needed anymore: ``data_3 released!``. The ``DataNodes`` with raw inputs such as integers are not released since there is no way for the graph to reconstruct them. 
-
-By the same token, if you were to run the graph from middle, say, at ``a4``:
-
-.. code:: python
-
-	a4.get()
-
-You will see:
-
-::
-
-	computing for data_10
-	adding_8 activated!
-	adding_0 activated!
-	computing for data_3
-	running adding_0
-	adding_0 deactivated!
-	running adding_8
-	data_3 released!
-	adding_8 deactivated!
-
-In this case, since ``return2_4`` is not activated, the ``data_3`` does not consider its presence in deciding release of memory. 
-
-On the other hand, ``run`` method will activate *all* operation nodes. This will make sure that even the operation nodes that do not have children are ran. However, the immediate memory release mechanism still applies to ``run`` method, unless otherwise specified. Refer below. 
-
 Memory persistance with Pyflow
 ------------------------------
 
-Lastly, you have the option of either persisting all of the intermediate results, or persisting part of the intermediate results.
+You have the option of either persisting all of the intermediate results, or persisting part of the intermediate results.
 
 To persist all intermediate results, use ``persist`` parameter at ``GraphBuilder`` level:
 
@@ -597,5 +518,83 @@ Some notes:
 4. Lastly, the ``persist`` flag is interoperable with Spark when PySpark dataframe is the data type. This means, when you persist the data using the DAG, if the underlying data is a PySpark dataframe, the Pyflow will persist the dataframe for you. However, unpersisting is not done by the Pyflow. If you want to unpersist a dataframe, do so manually. 
 
 
+Computation and memory efficiency of Pyflow (OUTDATED)
+-------------------------------------------
+
+When you invoke ``get`` method, pyflow will only then evaluate, and it will evaluate only the parts of the graph that is needed to be evaluated. Also, as soon as an intermediate result has no dependency, it will automatically release the memory back to the operating system. Let's take a tour of the computation process to better understand this mechanism by turning on ``verbose`` parameter. 
+
+.. code:: python
+
+	from pyflow import GraphBuilder
+
+	def adding(a, b):
+		return a + b
+
+	def multi_output_method(a, b):
+		return a+1, b+1
+
+	G = GraphBuilder(verbose=True)  # set verbose to True
+	a1 = G.add(adding)(1, 2)
+	a2, a3 = G.add(return2, n_out=2)(a1, 3)
+	a4 = G.add(adding)(a1, 5)
+	a5 = G.add(adding)(a4, a3)
+
+	a5.get()
+
+With ``verbose=True``, along with the final output, pyflow will also produce the following standard output:
+
+::
+
+	computing for data_12
+	adding_11 activated!
+	adding_8 activated!
+	adding_0 activated!
+	return2_4 activated!
+	computing for data_10
+	computing for data_3
+	running adding_0
+	adding_0 deactivated!
+	running adding_8
+	data_3 still needed at return2_4
+	adding_8 deactivated!
+	computing for data_7
+	running return2_4
+	data_3 released!
+	return2_4 deactivated!
+	running adding_11
+	data_10 released!
+	data_7 released!
+	adding_11 deactivated!
+
+Let's take the tour of this process by looking at the graph. Notice that in verbose mode, the graph will actually print out the uid's of the nodes not just their aliases (more on setting alias later!)
+
+.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/verbose_.png
+   :width: 10pt
+
+As pyflow tries to compute ``data_12``, it will first activate all the ``OperationNodes`` that is needed for the computation, in our case, those are ``adding_11``, ``adding_8``, ``adding_0``, ``return2_4``. It will then follow the lineage of the graph to work on intermediate results needed to proceed down the graph. Notice that as the computation proceeds, the ``OperationNodes`` that were activated are deactivated. When it gets to ``data_3``, notice that it is needed at both ``adding_8`` and ``return2_4``. Thus, once it completes ``adding_8``, it cannot yet release the memory from ``data_3``: ``data_3 still needed at return2_4``. But as soon as ``return2_4`` is ran, it releases ``data_3`` from memory, as it is not needed anymore: ``data_3 released!``. The ``DataNodes`` with raw inputs such as integers are not released since there is no way for the graph to reconstruct them. 
+
+By the same token, if you were to run the graph from middle, say, at ``a4``:
+
+.. code:: python
+
+	a4.get()
+
+You will see:
+
+::
+
+	computing for data_10
+	adding_8 activated!
+	adding_0 activated!
+	computing for data_3
+	running adding_0
+	adding_0 deactivated!
+	running adding_8
+	data_3 released!
+	adding_8 deactivated!
+
+In this case, since ``return2_4`` is not activated, the ``data_3`` does not consider its presence in deciding release of memory. 
+
+On the other hand, ``run`` method will activate *all* operation nodes. This will make sure that even the operation nodes that do not have children are ran. However, the immediate memory release mechanism still applies to ``run`` method, unless otherwise specified. Refer below. 
 
 
