@@ -338,7 +338,7 @@ Pyflow will create graph accordingly, such that the outputless operation node is
 	G.view(summary=False, graph_attributes=graph_attributes)
 
 
-.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/realisticGraph.png
+.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/no_output.png
    :width: 10pt
 
 
