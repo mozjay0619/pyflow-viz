@@ -164,7 +164,7 @@ At this point, we can add the corrected version of the method:
 
 	G.view(summary=False)
 
-.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/remove4.png
+.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/removing4.png
    :width: 17pt
 
 On a more technical note, even though there is variable ``b``, ``remove`` can still release the memory of all the associated nodes because Pyflow operates on weak references. Pyflow keeps only one strong reference per node inside the GraphBuilder class instance (i.e. ``strong_ref_dict``). To check this, simply check ``b`` variable upon invoking ``remove``. You will see that ``b`` is now a dead (weak) reference that does not point to any particular Python object in memory. 
