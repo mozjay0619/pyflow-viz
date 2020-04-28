@@ -130,9 +130,41 @@ def run_method():
     assert(a2.has_value())
     assert(a3.has_value())
 
+def test_multi_graph():
+    """Test multiple graph paradigm"""
 
+    G = GraphBuilder()
+    a1 = G.add(adding)(1, 2)
+    a2 = G.add(adding)(a1, 2)
+    a3 = G.add(adding)(a1, a2)
 
+    H = GraphBuilder()
+    a4 = H.add(adding)(a3, 1)
+    a5 = H.add(adding)(a4, 2)
+    a6 = H.add(adding)(a4, a5)
 
+    assert(a6.get() == 20)
 
+def test_multi_graph_with_persist():
+    """Test the persistence of prior graph persisted node"""
 
+    G = GraphBuilder()
+    a1 = G.add(adding)(1, 2)
+    a2 = G.add(adding)(a1, 2)
+    a3 = G.add(adding, persist=True)(a1, a2)
+
+    H = GraphBuilder()
+    a4 = H.add(adding)(a3, 1)
+    a5 = H.add(adding)(a4, 2)
+    a6 = H.add(adding)(a4, a5)
+
+    a6.get()
+
+    assert(~a1.has_value())
+    assert(~a2.has_value())
+    assert(a3.has_value())
+
+    assert(~a4.has_value())
+    assert(~a5.has_value())
+    assert(a6.has_value())
     
