@@ -246,13 +246,20 @@ You can take a look and play around with the rest of the configurations:
 	# the default settings are found at:
 	G.default_graph_attributes
 
-	# 'data_node_fontsize': 11, 
+	# 'data_node_fontsize': 10, 
 	# 'data_node_shape': 'box',
 	# 'data_node_color': None,
 	# 'op_node_fontsize': 12,
-	# 'op_node_shape': 'ellipse',
+	# 'op_node_shape': 'box',
 	# 'op_node_color': 'white',
-	# 'graph_ranksep': 0.475
+	# 'graph_ranksep': 0.475,
+	# 'graph_node_fontsize': 12.85,
+	# 'graph_node_shape': 'box3d',
+	# 'graph_node_color': 'white',
+	# 'graph_node_shapesize': 0.574,
+	# 'persist_record_shape': True
+
+
 
 Finally, you can set the alias of the nodes by passing in ``method_alias`` and/or ``output_alias`` in the ``add`` method. The ``method_alias`` will set the alias of the operation node being added, and ``output_alias`` will set the alias of the child data node of that operation node. 
 
