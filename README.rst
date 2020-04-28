@@ -374,7 +374,7 @@ Let's look at the unsummarized version to take notice of the output_alias of the
 	# let's make it a little shorter with ranksep parameter we talked about earlier!
 	G.view(summary=False, graph_attributes={'graph_ranksep': 0.3})
 
-.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/grafting15.png
+.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/graft2.png
    :width: 10pt
 
 In the above code, we have created one graph. But we can create another graph, and graft the ``First Graph`` graph to the new graph:
