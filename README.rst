@@ -593,7 +593,9 @@ Some notes:
 
 1. The op node with record box is a short hand way of conveying the message that the child data node of that op node will be persisted. 
 2. The raw data are automatically persisted, which is why you see the dimensionality information in the record box. This is because the raw user data inputs cannot be recomputed from the graph alone. But this will not be visible when ``summary=True``, because the op node will only show the record box for persisted child data node, and user supplied inputs will always be parent data node. 
-3. Also this is not made explicitly visible, the final leaf data node are always persisted when ``run`` method is invoked. But this will not be explicitly shown in the graph unless the user manually supplies ``persist`` flag at the ``add`` method invocation. 
+3. Although this is not made explicitly visible, the final leaf data node are always persisted when ``run`` method is invoked. But this will not be explicitly shown in the graph unless the user manually supplies ``persist`` flag at the ``add`` method invocation. 
+4. Lastly, the ``persist`` flag is interoperable when PySpark dataframe is the data type. This means, when you persist the data using the DAG, if the underlying data is a PySpark dataframe, the Pyflow will persist the dataframe for you. However, unpersisting is not done by the Pyflow. If you want to unpersist a dataframe, do so manually. 
+
 
 
 
