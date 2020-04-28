@@ -266,22 +266,22 @@ Finally, you can set the alias of the nodes by passing in ``method_alias`` and/o
 .. code:: python
 
 	G = GraphBuilder()
-	df1 = G.add(query_dataframe_A, rank=0, shape='cylinder', color='lightblue', output_alias='df_B')()
-	df2 = G.add(query_dataframe_B, rank=0, shape='cylinder', color='lightblue', output_alias='df_A')()
-	new_df1 = G.add(product_transform, method_alias='my_b_transf')(df1)
-	new_df2 = G.add(product_transform, method_alias='my_a_transf')(df2)
+	dfa = G.add(query_dataframe_A, rank=0, shape='cylinder', color='lightblue', output_alias='df_A')()
+	dfb = G.add(query_dataframe_B, rank=0, shape='cylinder', color='lightblue', output_alias='df_B')()
+	dfa1 = G.add(product_transform)(dfa)
+	dfb1 = G.add(product_transform)(dfb)
 	# note the list of alias for n_out = 2
-	dfa, dfb = G.add(split_transform, n_out=2, output_alias=['first_out', 'second_out'])(new_df2)
-	joined_df = G.add(join_transform, output_alias='final_data')(new_df1, dfa)
+	dfa, dfb = G.add(split_transform, n_out=2, output_alias=['first_out', 'second_out'])(dfa1)
+	joined_df = G.add(join_transform, output_alias='final_data')(dfb1, dfa)
 
 	graph_attributes = {'graph_ranksep': 0.25}
 	G.view(summary=False, graph_attributes=graph_attributes)
 
-.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/aliasGraph.png
+.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/aliasingGraph.png
    :width: 10pt
 
 
-The default alias for operation node is the String name of the method being passed in, and the default alias for data node is simply "data".
+The default alias for operation node is the String name of the method being passed in, and the default alias for data node is simply "data". We do not include the example of setting ``method_alias`` to discourage its use. Setting method alias different from the method name will make look up of graph node in the code base very difficult. 
 
 
 No output methods
