@@ -389,7 +389,7 @@ In the above code, we have created one graph. But we can create another graph, a
 
 	H.view(summary=False)  # notice that the output_alias from previous graph is also preserved! 
 
-.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/graft3.png
+.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/graft3_.png
    :width: 10pt
 
 As you can see, the previous graph is now summarized into a box. You can combine as many graphs in this way as you want. Despite this visual effect, ``b3`` is now part of one single big combined computation graph. Therefore, calling ``b3.get()`` will trigger computations in nodes that belong to both ``G`` and ``H`` as long as they are needed. As far as computation is concerned, you just have one big graph. 
