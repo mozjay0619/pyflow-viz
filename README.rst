@@ -555,6 +555,31 @@ In terms of the codes, these two are equivalent:
 	a1_val = a1.get()
 	a3_val = a3.get()
 
+Also, when you persist certain nodes, this persistence request will manifest in the graph by an empty record box:
+
+.. code:: python
+
+	from pyflow import GraphBuilder
+	
+	G = GraphBuilder()
+	a1 = G.add(adding)(1, 2)
+	a2 = G.add(adding)(a1, 3)
+	a3 = G.add(adding)(a2, a1)
+
+	G.view()
+
+.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/record1.png
+   :width: 10pt
+
+The empty box signifies that the graph is requested to persist that data, but it does not yet hold that data because it has not yet been executed. But once you run the graph, the empty record slot will be filled by the dimensionality of the resulting data. Currently it supports PySpark dataframe, numpy array, and pandas dataframe. All other data will have a default dimension of ``(1, )``. 
+
+.. code:: python
+
+	G.run()
+
+
+
+
 
 
 
