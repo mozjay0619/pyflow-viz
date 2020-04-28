@@ -102,7 +102,7 @@ The ``view`` function actually has the ability to summarize the DAG by only show
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/summary_false.png
    :width: 17pt
 
-With the summary functionality turned off, the complete DAG visualization will includes ``DataNodes`` as well as the ``OperationNodes``. 
+With the summary functionality turned off, the complete DAG visualization will includes ``DataNodes`` as well as the ``OperationNodes``. You may be wondering what the extra record with ``(1, )`` written inside. It signals the data persistence. We will discuss what this is, and how this works, in greater detail soon. 
 
 
 Removing methods
