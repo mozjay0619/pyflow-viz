@@ -407,7 +407,7 @@ You can easily save your DAG image by invoking ``save_view`` method, which retur
 The ``save_view`` method also has ``summary`` boolean parameter. You can also set the file name and file path by passing in ``dirpath`` and ``filename`` parameter. They default to current working directory and "digraph" respectively. You can also set the file format as png or pdf by setting ``fileformat`` parameter. The default is png. 
 
 
-Computation and memory efficiency of Pyflow
+Computation and memory efficiency of Pyflow (OUTDATED)
 -------------------------------------------
 
 When you invoke ``get`` method, pyflow will only then evaluate, and it will evaluate only the parts of the graph that is needed to be evaluated. Also, as soon as an intermediate result has no dependency, it will automatically release the memory back to the operating system. Let's take a tour of the computation process to better understand this mechanism by turning on ``verbose`` parameter. 
