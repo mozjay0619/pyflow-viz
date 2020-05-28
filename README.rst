@@ -519,7 +519,7 @@ Some notes:
 
 
 Computation and memory efficiency of Pyflow (OUTDATED)
--------------------------------------------
+------------------------------------------------------
 
 When you invoke ``get`` method, pyflow will only then evaluate, and it will evaluate only the parts of the graph that is needed to be evaluated. Also, as soon as an intermediate result has no dependency, it will automatically release the memory back to the operating system. Let's take a tour of the computation process to better understand this mechanism by turning on ``verbose`` parameter. 
 
