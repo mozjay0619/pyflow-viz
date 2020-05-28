@@ -6,7 +6,7 @@ from .utils import view_summary
 from .utils import save_graph_image
 from .utils import contains_return_statement
 from .utils import topological_sort
-from .utils import add_to_module_global_namespace
+# from .utils import add_to_module_global_namespace
 
 from collections import defaultdict
 from collections import Iterable
@@ -18,7 +18,7 @@ MAX_INTEGER = sys.maxsize
 
 class GraphBuilder():
     
-    def __init__(self, persist=False, verbose=False, alias=None, shared_args=dict()):
+    def __init__(self, persist=False, verbose=False, alias=None, inside_pandasUDF=None):#, shared_args=dict()):
 
         self.graph_alias = alias or "graph"
         self.graph_uid = "{}_{}".format(self.graph_alias, id(self))
@@ -46,13 +46,15 @@ class GraphBuilder():
         }
         self.user_defined_graph_attributes = None
 
-        if not isinstance(shared_args, dict):
-            raise TypeError("shared_args must be a dictionary. Instead received {}".format(shared_args))
-        self.shared_args = shared_args
+        self.inside_pandasUDF = inside_pandasUDF
+
+        # if not isinstance(shared_args, dict):
+        #     raise TypeError("shared_args must be a dictionary. Instead received {}".format(shared_args))
+        # self.shared_args = shared_args
     
     def add(self, func, method_alias=None, output_alias=None, n_out=1, persist=False, rank=None, color=None, shape=None, fontsize=None):
 
-        add_to_module_global_namespace(func, self.shared_args)
+        # add_to_module_global_namespace(func, self.shared_args)
         
         self.func = func
         self.method_alias = method_alias
@@ -143,7 +145,7 @@ class GraphBuilder():
         for i in range(self.n_out):
 
             # if the current method has no return statement, we do not want to create a child data node
-            if not contains_return_statement(self.func):
+            if not (self.inside_pandasUDF or contains_return_statement(self.func)):
                 continue
 
             child_data_node_uid = '{}_{}'.format(self.output_alias[i] or 'data', self.node_count)
