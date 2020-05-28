@@ -289,6 +289,6 @@ def topological_sort(graph_dict):
     
     return sorted_graph_dict
             
-def add_to_module_global_namespace(method, global_dict):
+# def add_to_module_global_namespace(method, global_dict):
 
-    method.__globals__.update(global_dict)
+#     method.__globals__.update(global_dict)
