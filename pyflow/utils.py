@@ -6,6 +6,7 @@ import inspect
 import textwrap
 
 from graphviz import Digraph
+import graphviz
 
 
 class ExtendedRef(weakref.ref):
@@ -244,12 +245,22 @@ def view_summary(graph_dict, graph_attributes, verbose, current_graph_uid):
 
 def save_graph_image(graph, dirpath=None, filename=None, fileformat=None):
     
-    graph.format = 'png' or fileformat
+    graph.format = fileformat or 'png'
     try:
-        dirpath = os.getcwd() or dirpath
-        filename = 'digraph' or filename
-        filename = filename
-        graph.view(filename=filename, directory=dirpath)
+        dirpath = dirpath or os.getcwd()
+        filename = filename or 'digraph' 
+        filepath = os.path.join(dirpath, filename)
+
+
+        graph = graphviz.Source(graph, format='png')
+        filepath_ = graph.render(filepath)
+        return filepath_
+
+
+        graph.view(filename=filename, directory=dirpath, quiet=True)
+
+
+
     except FileNotFoundError:
         pass
     finally:
@@ -288,7 +299,3 @@ def topological_sort(graph_dict):
         sorted_graph_dict[node_uid] = graph_dict[node_uid]
     
     return sorted_graph_dict
-            
-# def add_to_module_global_namespace(method, global_dict):
-
-#     method.__globals__.update(global_dict)
