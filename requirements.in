@@ -1,3 +1,4 @@
 graphviz>=0.13.2
 pandas
 numpy
+bokeh==2.0.1

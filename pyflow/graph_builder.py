@@ -180,6 +180,9 @@ class GraphBuilder():
                                       'fontsize': self.fontsize,
                                       'shapesize': None}
 
+        method_attributes_dict = {'name': self.func.__name__, 
+                                  'doc_string': self.func.__doc__}
+
         op_node_properties_dict = {'children': [], 
                                    'parents': [], 
                                    'type': 'operation', 
@@ -189,7 +192,8 @@ class GraphBuilder():
                                    'node_uid': op_node_weak_ref().node_uid,
                                    'graph_alias': self.graph_alias,
                                    'graph_uid': op_node_weak_ref().graph_uid,
-                                   'attributes': node_graph_attributes_dict}
+                                   'attributes': node_graph_attributes_dict,
+                                   'method_attributes': method_attributes_dict}
 
         # add the op node visualization attributes to the graph_dict
         self.graph_dict[op_node_uid] = op_node_properties_dict

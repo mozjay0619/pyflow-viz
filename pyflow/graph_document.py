@@ -1,0 +1,145 @@
+from bokeh.io import output_notebook, show, output_file
+from bokeh.layouts import gridplot
+from bokeh.models.widgets import Div
+from bokeh.models.widgets import Paragraph
+from bokeh.models.widgets import PreText
+from bokeh.plotting import figure, show, output_file
+import bokeh
+
+import struct
+import imghdr
+import base64
+import os
+
+
+def get_image_size(fname):
+    '''Determine the image type of fhandle and return its size.
+    from draco'''
+    with open(fname, 'rb') as fhandle:
+        head = fhandle.read(24)
+        if len(head) != 24:
+            return
+        if imghdr.what(fname) == 'png':
+            check = struct.unpack('>i', head[4:8])[0]
+            if check != 0x0d0a1a0a:
+                return
+            width, height = struct.unpack('>ii', head[16:24])
+        elif imghdr.what(fname) == 'gif':
+            width, height = struct.unpack('<HH', head[6:10])
+        elif imghdr.what(fname) == 'jpeg':
+            try:
+                fhandle.seek(0) # Read 0xff next
+                size = 2
+                ftype = 0
+                while not 0xc0 <= ftype <= 0xcf:
+                    fhandle.seek(size, 1)
+                    byte = fhandle.read(1)
+                    while ord(byte) == 0xff:
+                        byte = fhandle.read(1)
+                    ftype = ord(byte)
+                    size = struct.unpack('>H', fhandle.read(2))[0] - 2
+                # We are at a SOFn block
+                fhandle.seek(1, 1)  # Skip `precision' byte.
+                height, width = struct.unpack('>HH', fhandle.read(4))
+            except Exception: #IGNORE:W0703
+                return
+        else:
+            return
+        return width, height
+    
+def add_graph_alias(graph_obj):
+    
+    html_str = "<h3>{}</h3>".format(graph_obj.graph_alias)
+    return html_str
+
+def add_graph_image(graph_obj, dirpath=None, filename=None, summary=True, graph_attributes=None):
+    
+    graph_img_path = graph_obj.save_view(summary=summary, graph_attributes=graph_attributes, 
+                                         dirpath=dirpath, filename=filename)
+    
+    html_str = "<html>\n"
+    data_uri = base64.b64encode(open(graph_img_path, 'rb').read()).decode('utf-8')
+    html_str += '<img src="data:image/png;base64,{}">'.format(data_uri)
+    
+    os.remove(graph_img_path)
+    return html_str
+
+def add_method_doc_string(graph_obj):
+        
+    html_str = ""
+    ops_dict = {k: v for k, v in graph_obj.graph_dict.items() if v['type']=='operation'}
+    ops_uids = list(ops_dict.keys())
+    ops_uids = sorted(ops_uids, key = lambda x: int(x.split('_')[-1]))
+
+    for op_uid in ops_uids:
+        func_name = ops_dict[op_uid]['method_attributes']['name']
+        func_docstr = ops_dict[op_uid]['method_attributes']['doc_string']
+        
+        html_str += " {}\n".format(func_name)
+        html_str += "{}".format(func_docstr)
+
+    return html_str
+
+def get_layout_elements(graph_obj):
+
+    graph_img_path = graph_obj.save_view(summary=True, graph_attributes=None, 
+                                         dirpath=None, filename=None)
+
+    img_width_x, img_height_y = get_image_size(graph_img_path)
+    frame_width_x, frame_height_y = 975, max(550, min(img_height_y, 750))
+
+    graph_overview_header = Div(text="""<h2>Graphs Overview</h2>""", width=300, height=40)
+    graph_alias = Div(text=add_graph_alias(graph_obj), width=500, height=40)
+
+    method_docstrs = PreText(text=add_method_doc_string(graph_obj), width=630, height=frame_height_y, 
+                             style={'overflow-y':'scroll',
+                                    'height':'{}px'.format(frame_height_y), 
+                                    'margin-right': 'auto', 
+                                    'margin-left': 'auto'})
+
+    p = figure(x_range=(0, frame_width_x), y_range=(frame_height_y, 0))  # visible range
+    p.xaxis.visible = False
+    p.yaxis.visible = False 
+    p.xgrid.visible = False
+    p.ygrid.visible = False
+    p.background_fill_color = None
+    p.border_fill_color = None
+
+    p.plot_width=frame_width_x
+    p.plot_height=frame_height_y
+
+    MAX_RATIO = 1.25
+
+    if (img_width_x > frame_width_x) or (img_height_y > frame_height_y):
+        width_ratio = img_width_x / frame_width_x
+        height_ratio = img_height_y / frame_height_y
+
+        max_ratio = max(width_ratio, height_ratio)
+        if max_ratio > MAX_RATIO:
+            max_ratio = MAX_RATIO
+
+        img_width_x = img_width_x / max_ratio
+        img_height_y = img_height_y / max_ratio
+
+
+    p.image_url(url=[graph_img_path], x=0, y=0, w=img_width_x, h=img_height_y, anchor="top_left")
+    
+    return graph_alias, p, method_docstrs
+
+def document(*graph_objs):
+    
+    graph_overview_header = Div(text="""<h2>Graphs Overview</h2>""", width=300, height=40)
+    
+    grid = [[graph_overview_header, None]]
+    
+    for graph_obj in graph_objs:
+        graph_alias, p, method_docstrs = get_layout_elements(graph_obj)
+        grid.append([graph_alias, None])
+        grid.append([p, method_docstrs])
+        
+    grids = gridplot(grid, toolbar_location='right')
+    
+    output_file('output_file_test.html', 
+            title='Empty Bokeh Figure')
+
+    show(grids)

@@ -15,8 +15,8 @@ setup(
 	description="Lazy computation directed acyclic graph builder",
 	long_description=long_description,
 	long_description_content_type="text/x-rst",
-	url=None,
+	url="https://github.com/mozjay0619/pyflow-viz",
 	license="DSB 3-clause",
 	packages=find_packages(),
-	install_requires=["graphviz>=0.13.2"]
+	install_requires=["graphviz>=0.13.2", "bokeh==2.0.1"]
 	)
