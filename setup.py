@@ -18,5 +18,5 @@ setup(
 	url="https://github.com/mozjay0619/pyflow-viz",
 	license="DSB 3-clause",
 	packages=find_packages(),
-	install_requires=["graphviz>=0.13.2", "bokeh==2.0.1"]
+	install_requires=["graphviz>=0.13.2"]
 	)
