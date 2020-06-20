@@ -103,7 +103,17 @@ def view_full(graph_dict, graph_attributes, verbose, current_graph_uid):
                     height=shapesize, width=shapesize, fillcolor=color, style='filled')
 
                 for child in v['children']:
+
                     label = graph_dict[child]['node_uid'] if verbose else graph_dict[child]['alias']
+
+                    if graph_attributes['persist_record_shape'] and graph_dict[child]['is_persisted']:
+                        shape = 'record'
+                        data_dim = graph_dict[child]['data_dim']
+                        label = "{{{}|{}}}".format(label, data_dim)
+
+                    else:
+                        shape = graph_attributes['data_node_shape']
+                    
                     graph.node(
                         child, 
                         label=label,
@@ -113,7 +123,17 @@ def view_full(graph_dict, graph_attributes, verbose, current_graph_uid):
                     graph.edge(k, child)
 
                 for parent in v['parents']:
+
                     label = graph_dict[parent]['node_uid'] if verbose else graph_dict[parent]['alias']
+
+                    if graph_attributes['persist_record_shape'] and graph_dict[parent]['is_persisted']:
+                        shape = 'record'
+                        data_dim = graph_dict[parent]['data_dim']
+                        label = "{{{}|{}}}".format(label, data_dim)
+
+                    else:
+                        shape = graph_attributes['data_node_shape']
+
                     graph.node(
                         parent, 
                         label=label,
@@ -173,7 +193,6 @@ def view_full(graph_dict, graph_attributes, verbose, current_graph_uid):
 
             label = graph_dict[child]['node_uid'] if verbose else graph_dict[child]['alias']
 
-
             if graph_attributes['persist_record_shape'] and graph_dict[child]['is_persisted']:
                 shape = 'record'
                 data_dim = graph_dict[child]['data_dim']
@@ -203,7 +222,7 @@ def view_full(graph_dict, graph_attributes, verbose, current_graph_uid):
                 shape = graph_attributes['data_node_shape']
 
             graph.node(
-                parent, 
+                parent,
                 label=label,
                 shape=shape, 
                 fontsize=graph_attributes['data_node_fontsize'], 
@@ -256,10 +275,7 @@ def save_graph_image(graph, dirpath=None, filename=None, fileformat=None):
         filepath_ = graph.render(filepath)
         return filepath_
 
-
         graph.view(filename=filename, directory=dirpath, quiet=True)
-
-
 
     except FileNotFoundError:
         pass
