@@ -6,11 +6,20 @@ from bokeh.models.widgets import PreText
 from bokeh.plotting import figure, show, output_file
 import bokeh
 
+import numpy as np
 import struct
 import imghdr
 import base64
 import os
 
+from subprocess import check_call
+from scipy import optimize
+from skimage import io
+
+TMP_DIGRAPH_FILEPATH = 'digraph.png'
+TMP_GRAPH_RENDER_FILEPATH = 'pyflow_tmp'
+TMP_GRAPH_RENDER_PDF_FILEPATH = 'pyflow_tmp.pdf'
+TMP_PNG_FILEPATH = 'OutputFile.png'
 
 def get_image_size(fname):
     '''Determine the image type of fhandle and return its size.
@@ -86,6 +95,7 @@ def get_layout_elements(graph_obj):
                                          dirpath=None, filename=None)
 
     img_width_x, img_height_y = get_image_size(graph_img_path)
+    
     frame_width_x, frame_height_y = 975, max(550, min(img_height_y, 750))
 
     graph_overview_header = Div(text="""<h2>Graphs Overview</h2>""", width=300, height=40)
@@ -121,13 +131,23 @@ def get_layout_elements(graph_obj):
         img_width_x = img_width_x / max_ratio
         img_height_y = img_height_y / max_ratio
 
+    graph = graph_obj.view()
+    filepath_ = graph.render('pyflow_tmp')
+    
+    print("\u2714 Rendering graph [ {} ]...          ".format(G.graph_alias), end="", flush=True)
+    dpi = tune_dpi(img_height_y, img_width_x)
+    check_call(['dot','-Tpng', '-Gdpi={}'.format(dpi[0]-1), TMP_GRAPH_RENDER_FILEPATH, '-o', TMP_PNG_FILEPATH])
 
-    p.image_url(url=[graph_img_path], x=0, y=0, w=img_width_x, h=img_height_y, anchor="top_left")
+    img = io.imread(TMP_PNG_FILEPATH)
+    p.image_rgba(image=[np.array(img)[::-1, :, :]], x=0, y=img_height_y, dw=img_width_x, dh=img_height_y, 
+                  dilate=False, global_alpha=10)
+    print('Completed!')
     
     return graph_alias, p, method_docstrs
 
-def document(*graph_objs):
+def document(*graph_objs, filename=None):
     
+    filename = 'output_file.html'
     graph_overview_header = Div(text="""<h2>Graphs Overview</h2>""", width=300, height=40)
     
     grid = [[graph_overview_header, None]]
@@ -139,7 +159,27 @@ def document(*graph_objs):
         
     grids = gridplot(grid, toolbar_location='right')
     
-    output_file('output_file_test.html', 
-            title='Empty Bokeh Figure')
+    output_file(filename, 
+            title='Bokeh Figure')
 
     show(grids)
+    
+    filepath = os.path.join(os.getcwd(), filename)
+    print('\nRendered html file location: {}'.format(filepath))
+
+def tune_dpi(height, width):
+    
+    def f(x, args):
+        if x[0] < 5:
+            return 999999999
+        check_call(['dot','-Tpng', '-Gdpi={}'.format(x[0]), TMP_GRAPH_RENDER_FILEPATH,'-o', TMP_PNG_FILEPATH])
+        img = io.imread(TMP_PNG_FILEPATH)
+        return mae(img.shape[0:2], args)
+        
+    re = optimize.minimize(f, x0=[50], 
+                           args=[height, width],  method="Nelder-Mead")
+    return re.x
+
+def mae(array1, array2):
+    
+    return np.average(np.abs(np.asarray(array1) - np.asarray(array2)), axis=0)

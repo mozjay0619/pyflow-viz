@@ -10,6 +10,7 @@ class DataHolderNode(BaseNode):
         super(DataHolderNode, self).__init__(graph_uid, graph_alias, node_uid, 'data_holder', verbose)
 
         self.value = value
+        self.dim = None
         
     def get(self):
         return self.value
@@ -32,21 +33,24 @@ class DataHolderNode(BaseNode):
         if not self.has_value:
             raise ValueError("There is no value!")
 
+        if self.dim is not None:
+            return self.dim
+
         if hasattr(self.value, "rdd"):
             row_cnt = self.get().persist().count()
             col_cnt = len(self.get().columns)
-            dim = (row_cnt, col_cnt)
+            self.dim = (row_cnt, col_cnt)
 
         elif isinstance(self.value, np.ndarray):
-            dim = self.value.shape
+            self.dim = self.value.shape
 
         elif isinstance(self.value, pd.DataFrame):
-            dim = self.value.shape
+            self.dim = self.value.shape
 
         else:
-            return("(1, )")
+            self.dim = "(1, )"
 
-        return str(dim)
+        return str(self.dim)
         
     def __del__(self):
         if self.verbose:
