@@ -176,7 +176,7 @@ def document(*graph_objs, filename=None):
     filepath = os.path.join(os.getcwd(), filename)
     print('\nRendered html file location: {}'.format(filepath))
 
-    self.cleanup_dir()
+    cleanup_dir()
 
 def tune_dpi(height, width):
     
