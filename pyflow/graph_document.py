@@ -176,6 +176,8 @@ def document(*graph_objs, filename=None):
     filepath = os.path.join(os.getcwd(), filename)
     print('\nRendered html file location: {}'.format(filepath))
 
+    self.cleanup_dir()
+
 def tune_dpi(height, width):
     
     def f(x, args):
@@ -192,3 +194,10 @@ def tune_dpi(height, width):
 def mae(array1, array2):
     
     return np.average(np.abs(np.asarray(array1) - np.asarray(array2)), axis=0)
+
+def cleanup_dir():
+
+    os.remove(TMP_DIGRAPH_FILEPATH)
+    os.remove(TMP_GRAPH_RENDER_FILEPATH)
+    os.remove(TMP_GRAPH_RENDER_PDF_FILEPATH)
+    os.remove(TMP_PNG_FILEPATH)
