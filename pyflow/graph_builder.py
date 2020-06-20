@@ -423,6 +423,10 @@ class GraphBuilder():
 
         return {k: str(v) for k, v in self.graph_attributes.items()}
 
+    def update_graph_attributes(self, graph_attributes):
+
+        self.user_defined_graph_attributes = graph_attributes
+
     def preprocess_graph_dict(self):
         """
         1. support for multi graph
@@ -457,9 +461,7 @@ class GraphBuilder():
     def view(self, summary=True, graph_attributes=None):
 
         if graph_attributes:  # need validity check here
-            self.user_defined_graph_attributes = graph_attributes
-        else:
-            self.user_defined_graph_attributes = None  # I don't like this
+            self.update_graph_attributes(graph_attributes)
 
         preprocessed_graph_dict = self.preprocess_graph_dict()
         

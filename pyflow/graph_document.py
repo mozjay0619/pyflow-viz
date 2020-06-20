@@ -156,7 +156,7 @@ def get_layout_elements(graph_obj):
 
 def document(*graph_objs, filename=None):
     
-    filename = 'output_file.html'
+    filename = 'graphs_overview.html'
     graph_overview_header = Div(text="""<h2>Graphs Overview</h2>""", width=300, height=40)
     
     grid = [[graph_overview_header, None]]
