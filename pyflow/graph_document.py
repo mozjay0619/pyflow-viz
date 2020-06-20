@@ -140,6 +140,14 @@ def get_layout_elements(graph_obj):
     check_call(['dot','-Tpng', '-Gdpi={}'.format(dpi-1), TMP_GRAPH_RENDER_FILEPATH, '-o', TMP_PNG_FILEPATH])
 
     img = io.imread(TMP_PNG_FILEPATH)
+
+    if img.shape[-1]==3:
+        rgba = np.zeros([*img.shape[0:2], 4])
+        rgba[:, :, 3] = 255
+        rgba[:, :, 0:3] = img
+        img = rgba
+        img = img.astype(np.uint8)
+
     p.image_rgba(image=[np.array(img)[::-1, :, :]], x=0, y=img_height_y, dw=img_width_x, dh=img_height_y, 
                   dilate=False, global_alpha=10)
     print('Completed!')
