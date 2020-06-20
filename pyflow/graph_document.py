@@ -136,7 +136,8 @@ def get_layout_elements(graph_obj):
     
     print("\u2714 Rendering graph [ {} ]...          ".format(graph_obj.graph_alias), end="", flush=True)
     dpi = tune_dpi(img_height_y, img_width_x)
-    check_call(['dot','-Tpng', '-Gdpi={}'.format(dpi[0]-1), TMP_GRAPH_RENDER_FILEPATH, '-o', TMP_PNG_FILEPATH])
+    dpi = int(dpi[0])
+    check_call(['dot','-Tpng', '-Gdpi={}'.format(dpi-1), TMP_GRAPH_RENDER_FILEPATH, '-o', TMP_PNG_FILEPATH])
 
     img = io.imread(TMP_PNG_FILEPATH)
     p.image_rgba(image=[np.array(img)[::-1, :, :]], x=0, y=img_height_y, dw=img_width_x, dh=img_height_y, 
