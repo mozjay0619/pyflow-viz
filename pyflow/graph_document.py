@@ -90,17 +90,37 @@ def add_method_doc_string(graph_obj):
         else:
 
             tmp_docstrs = func_docstr.split('\n')
-            tmp_docstrs = [elem.lstrip() for elem in tmp_docstrs]
+            stripped_tmp_docstrs = [elem.lstrip() for elem in tmp_docstrs]
 
-            while(tmp_docstrs[0]==''):
+            while(stripped_tmp_docstrs[0]==''):
                 tmp_docstrs.pop(0)
-            tmp_docstrs.insert(0, '')
+                stripped_tmp_docstrs.pop(0)
 
-            while(tmp_docstrs[-1]==''):
+
+            while(stripped_tmp_docstrs[-1]==''):
                 tmp_docstrs.pop()
-            tmp_docstrs.append('')
+                stripped_tmp_docstrs.pop()
 
-            tmp_docstrs = ['    ' + elem for elem in tmp_docstrs]
+
+            tmp_docstrs_body = tmp_docstrs[2:-1]
+
+            while True:
+                
+                first_letters = [elem[0] for elem in tmp_docstrs_body if elem[0]==' ']
+                
+                if len(first_letters) == len(tmp_docstrs_body):
+                    tmp_docstrs_body = [elem[1:] for elem in tmp_docstrs_body]
+                
+                else:
+                    break
+        
+            tmp_docstrs_header = tmp_docstrs[0].lstrip()
+            tmp_docstrs_body.insert(0, tmp_docstrs_header)
+
+            tmp_docstrs_body.insert(0, '')
+            tmp_docstrs_body.append('')
+
+            tmp_docstrs = ['    ' + elem for elem in tmp_docstrs_body]
             func_docstr = '\n'.join(tmp_docstrs)
         
         html_str += " {}\n".format(func_name)
