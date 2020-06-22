@@ -94,6 +94,11 @@ def view_full(graph_dict, graph_attributes, verbose, current_graph_uid):
                     shapesize = str(v['attributes']['shapesize'])
                 else:
                     shapesize = '0.0'
+
+                if current_graph_uid==v['graph_uid'] and graph_attributes['persist_record_shape'] and v['is_persisted']:
+                    shape = 'record'
+                    data_dim = v['data_dim']
+                    label = "{{{}|{}}}".format(label, data_dim)
                             
                 subg.node(
                     k, 

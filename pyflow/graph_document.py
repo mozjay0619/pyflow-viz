@@ -88,12 +88,18 @@ def add_method_doc_string(graph_obj):
             func_docstr = ""
             
         else:
+
             tmp_docstrs = func_docstr.split('\n')
-
-            if tmp_docstrs[0]!='':
-                tmp_docstrs.insert(0, '')
-
             tmp_docstrs = [elem.lstrip() for elem in tmp_docstrs]
+
+            while(tmp_docstrs[0]==''):
+                tmp_docstrs.pop(0)
+            tmp_docstrs.insert(0, '')
+
+            while(tmp_docstrs[-1]==''):
+                tmp_docstrs.pop()
+            tmp_docstrs.append('')
+
             tmp_docstrs = ['    ' + elem for elem in tmp_docstrs]
             func_docstr = '\n'.join(tmp_docstrs)
         
