@@ -111,7 +111,7 @@ def add_method_doc_string(graph_obj):
                 if len(first_letters)==0:
                     break
                 
-                if len(first_letters)==len(tmp_docstrs_body):
+                if len(first_letters)==len([elem for elem in tmp_docstrs_body if not elem=='']):
                     tmp_docstrs_body = [elem[1:] for elem in tmp_docstrs_body]
                 
                 else:
