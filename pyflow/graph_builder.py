@@ -37,7 +37,7 @@ class GraphBuilder():
             'op_node_fontsize': 12,
             'op_node_shape': 'box',
             'op_node_color': 'white',
-            'graph_ranksep': 0.475,
+            'graph_ranksep': 0.415,
             'graph_node_fontsize': 12.85,
             'graph_node_shape': 'box3d',
             'graph_node_color': 'white',
