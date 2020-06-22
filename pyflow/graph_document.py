@@ -90,6 +90,7 @@ def add_method_doc_string(graph_obj):
         else:
 
             tmp_docstrs = func_docstr.split('\n')
+
             stripped_tmp_docstrs = [elem.lstrip() for elem in tmp_docstrs]
 
             while(stripped_tmp_docstrs[0]==''):
@@ -101,14 +102,16 @@ def add_method_doc_string(graph_obj):
                 tmp_docstrs.pop()
                 stripped_tmp_docstrs.pop()
 
-
-            tmp_docstrs_body = tmp_docstrs[2:-1]
+            tmp_docstrs_body = tmp_docstrs[1:]
 
             while True:
                 
-                first_letters = [elem[0] for elem in tmp_docstrs_body if elem[0]==' ']
+                first_letters = [elem[0] for elem in tmp_docstrs_body if not elem=='' and elem[0]==' ']
+
+                if len(first_letters)==0:
+                    break
                 
-                if len(first_letters) == len(tmp_docstrs_body):
+                if len(first_letters)==len(tmp_docstrs_body):
                     tmp_docstrs_body = [elem[1:] for elem in tmp_docstrs_body]
                 
                 else:
@@ -123,7 +126,7 @@ def add_method_doc_string(graph_obj):
             tmp_docstrs = ['    ' + elem for elem in tmp_docstrs_body]
             func_docstr = '\n'.join(tmp_docstrs)
         
-        html_str += " {}\n".format(func_name)
+        html_str += "\u25B6 {}\n".format(func_name)
         html_str += "{}\n".format(func_docstr)
 
     return html_str
