@@ -83,13 +83,26 @@ def add_method_doc_string(graph_obj):
     for op_uid in ops_uids:
         func_name = ops_dict[op_uid]['method_attributes']['name']
         func_docstr = ops_dict[op_uid]['method_attributes']['doc_string']
+
+        if func_docstr is None:
+            func_docstr = ""
+            
+        else:
+            tmp_docstrs = func_docstr.split('\n')
+
+            if tmp_docstrs[0]!='':
+                tmp_docstrs.insert(0, '')
+
+            tmp_docstrs = [elem.lstrip() for elem in tmp_docstrs]
+            tmp_docstrs = ['    ' + elem for elem in tmp_docstrs]
+            func_docstr = '\n'.join(tmp_docstrs)
         
         html_str += " {}\n".format(func_name)
-        html_str += "{}".format(func_docstr)
+        html_str += "{}\n".format(func_docstr)
 
     return html_str
 
-def get_layout_elements(graph_obj):
+def get_layout_elements(graph_obj, pixel_offset):
 
     graph_img_path = graph_obj.save_view(summary=True, graph_attributes=None, 
                                          dirpath=None, filename=None)
@@ -137,7 +150,7 @@ def get_layout_elements(graph_obj):
     print("\u2714 Rendering graph [ {} ]...          ".format(graph_obj.graph_alias), end="", flush=True)
     dpi = tune_dpi(img_height_y, img_width_x)
     dpi = int(dpi[0])
-    check_call(['dot','-Tpng', '-Gdpi={}'.format(dpi-1), TMP_GRAPH_RENDER_FILEPATH, '-o', TMP_PNG_FILEPATH])
+    check_call(['dot','-Tpng', '-Gdpi={}'.format(dpi+pixel_offset), TMP_GRAPH_RENDER_FILEPATH, '-o', TMP_PNG_FILEPATH])
 
     img = io.imread(TMP_PNG_FILEPATH)
 
@@ -154,7 +167,7 @@ def get_layout_elements(graph_obj):
     
     return graph_alias, p, method_docstrs
 
-def document(*graph_objs, filename=None):
+def document(*graph_objs, filename=None, pixel_offset=-1):
     
     filename = 'graphs_overview.html'
     graph_overview_header = Div(text="""<h2>Graphs Overview</h2>""", width=300, height=40)
@@ -162,7 +175,7 @@ def document(*graph_objs, filename=None):
     grid = [[graph_overview_header, None]]
     
     for graph_obj in graph_objs:
-        graph_alias, p, method_docstrs = get_layout_elements(graph_obj)
+        graph_alias, p, method_docstrs = get_layout_elements(graph_obj, pixel_offset)
         grid.append([graph_alias, None])
         grid.append([p, method_docstrs])
         
