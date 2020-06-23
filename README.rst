@@ -406,6 +406,63 @@ You can easily save your DAG image by invoking ``save_view`` method, which retur
 
 The ``save_view`` method also has ``summary`` boolean parameter. You can also set the file name and file path by passing in ``dirpath`` and ``filename`` parameter. They default to current working directory and "digraph" respectively. You can also set the file format as png or pdf by setting ``fileformat`` parameter. The default is png. 
 
+HTML documentation of DAG
+-------------------------
+
+With the visualization of the DAG, we can see the input-output relations among the functions, but it alone does not tell what each of the function does. But you can create a single HTML documentation that tells the complete semantic story of the DAG, using ``document`` method:
+
+.. code:: python
+
+	from pyflow import document
+
+	document(G)  # or document(G, H, I) etc if you have more than one graph
+
+Doing so will create a static HTML file that displays the DAG image as well as the docstrings of each of the functions that goes into the DAG on the right side, which you can scroll through.
+
+.. code:: python
+
+	from pyflow import GraphBuilder
+	from pyflow import document
+
+	def methodA(elem):
+		"""Some descriptions of the methodA
+		
+		Parameter
+		---------
+		elem : int
+		"""
+		return elem
+
+	def methodB(elem):
+		"""Some descriptions of the methodB
+		
+		Parameter
+		---------
+		elem : int
+		"""
+		return elem
+
+	def methodC(elem):
+		"""Some descriptions of the methodC
+		
+		Parameter
+		---------
+		elem : int
+		"""
+		return elem
+
+	G = GraphBuilder()
+	a = G.add(methodA)(3)
+	b = G.add(methodB)(a)
+	c = G.add(methodC)(b)
+
+	document(G)
+
+This code will produce the following HTML file:
+
+.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/document.png
+   :width: 10pt
+
 
 Memory persistance with Pyflow
 ------------------------------
