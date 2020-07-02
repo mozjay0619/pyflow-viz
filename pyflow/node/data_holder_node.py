@@ -36,7 +36,12 @@ class DataHolderNode(BaseNode):
         if self.dim is not None:
             return self.dim
 
-        if hasattr(self.value, "rdd"):
+        try:
+            is_spark_object = hasattr(self.value, "rdd")
+        except KeyError:
+            is_spark_object = False
+
+        if is_spark_object:
             row_cnt = self.get().persist().count()
             col_cnt = len(self.get().columns)
             self.dim = (row_cnt, col_cnt)
