@@ -30,6 +30,9 @@ class DataHolderNode(BaseNode):
 
         The dimensionality of other types of data defaults to "(0)"
         """
+        if self.verbose:
+            print('persisting {}'.format(self.node_uid))
+            
         if not self.has_value:
             raise ValueError("There is no value!")
 

@@ -18,7 +18,16 @@ MAX_INTEGER = sys.maxsize
 
 class GraphBuilder():
     
-    def __init__(self, persist=False, verbose=False, alias=None, inside_pandasUDF=None):#, shared_args=dict()):
+    def __init__(self, alias=None, persist=False, verbose=False, inside_pandasUDF=None):#, shared_args=dict()):
+
+        if not (isinstance(alias, str) or alias is None):
+            raise TypeError("[ alias ] must be either None or string type")
+
+        if not isinstance(persist, bool):
+            raise TypeError("[ persist ] must be bool type")
+
+        if not isinstance(verbose, bool):
+            raise TypeError("[ verbose ] must be bool type")
 
         self.graph_alias = alias or "graph"
         self.graph_uid = "{}_{}".format(self.graph_alias, id(self))
