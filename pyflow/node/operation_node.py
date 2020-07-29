@@ -74,6 +74,10 @@ class OperationNode(BaseNode):
             # if the parent node is persisted, no need to check for its children op nodes
             if parent_data_node_weak_ref().is_persisted():
                 continue
+
+            # if the parent node is shallowly persisted, no need to check for its children op nodes
+            if parent_data_node_weak_ref().is_shallowly_persisted():
+                continue
             
             # checking the child op nodes of the current parent data node
             for child_op_node_weak_ref in parent_data_node_weak_ref().get_child_node_weak_refs():

@@ -30,14 +30,16 @@ class DataHolderNode(BaseNode):
 
         The dimensionality of other types of data defaults to "(0)"
         """
-        if self.verbose:
-            print('persisting {}'.format(self.node_uid))
-            
         if not self.has_value:
             raise ValueError("There is no value!")
 
         if self.dim is not None:
+            if self.verbose:
+                print('{} has been persisted'.format(self.node_uid))
             return self.dim
+
+        if self.verbose:
+            print('persisting {}'.format(self.node_uid))
 
         try:
             is_spark_object = hasattr(self.value, "rdd")

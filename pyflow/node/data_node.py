@@ -17,6 +17,8 @@ class DataNode(BaseNode):
 
         self.graph_dict = graph_dict
 
+        self.shallow_persist = False
+
     def set_value(self, value):
         
         self.value_holder.set_value(value)
@@ -28,10 +30,18 @@ class DataNode(BaseNode):
     def persist(self):
 
         self.data_persist = True
+
+    def shallowly_persist(self):
+
+        self.shallow_persist = True
         
     def is_persisted(self):
         
         return self.data_persist
+
+    def is_shallowly_persisted(self):
+
+        return self.shallow_persist
 
     def get_persisted_data_dim_as_str(self):
 
@@ -47,14 +57,14 @@ class DataNode(BaseNode):
         
         if self.value_holder.has_value():
 
+            if self.verbose and self.is_shallowly_persisted():
+                print('{} has been shallowly persisted'.format(self.node_uid))
+
             # update graph_dict 
             # during a computation execution, the value_holder can hold transient data
             # so we need to check that this data node is indeed persisted
             # as well as actually has data
             if self.is_persisted():
-                if self.verbose:
-                    print('persisted', self.node_uid)
-
                 data_dim = self.get_persisted_data_dim_as_str()
                 self.graph_dict[self.node_uid]['data_dim'] = data_dim
 
@@ -68,9 +78,6 @@ class DataNode(BaseNode):
 
             # update graph_dict
             if self.is_persisted():
-                if self.verbose:
-                    print('persisted', self.node_uid)
-
                 data_dim = self.get_persisted_data_dim_as_str()
                 self.graph_dict[self.node_uid]['data_dim'] = data_dim
 
