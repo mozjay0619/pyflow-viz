@@ -329,6 +329,9 @@ class GraphBuilder():
         
         requested_data_nodes = [(k, v) for k, v in self.strong_ref_dict.items() 
                                      if v.node_uid in requested_data_node_uids]
+
+        for k, v in requested_data_nodes:
+            v.shallowly_persist()
         
         op_nodes = [(k, v) for k, v in self.strong_ref_dict.items() if v.node_type == 'operation']
 
