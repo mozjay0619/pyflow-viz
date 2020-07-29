@@ -330,9 +330,6 @@ class GraphBuilder():
         requested_data_nodes = [(k, v) for k, v in self.strong_ref_dict.items() 
                                      if v.node_uid in requested_data_node_uids]
         
-        for k, v in requested_data_nodes:
-            v.persist()
-        
         op_nodes = [(k, v) for k, v in self.strong_ref_dict.items() if v.node_type == 'operation']
 
         for k, v in op_nodes:
@@ -340,13 +337,6 @@ class GraphBuilder():
         
         for k, v in op_nodes:
             v.run()
-
-        # because op node calls get only on the parent data node, 
-        # and directly assigns the current function result to child node
-        # invoke get() on the last op node's child data node to make sure the 
-        # necessary persistance occurs.
-        for child_data_node_weak_ref in v.child_node_weak_refs:
-            child_data_node_weak_ref().get()
         
         if len(args) == 1:
             return args[0].get()

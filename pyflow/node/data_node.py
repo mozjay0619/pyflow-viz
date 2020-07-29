@@ -52,9 +52,6 @@ class DataNode(BaseNode):
             # so we need to check that this data node is indeed persisted
             # as well as actually has data
             if self.is_persisted():
-                if self.verbose:
-                    print('persisted', self.node_uid)
-
                 data_dim = self.get_persisted_data_dim_as_str()
                 self.graph_dict[self.node_uid]['data_dim'] = data_dim
 
@@ -68,9 +65,6 @@ class DataNode(BaseNode):
 
             # update graph_dict
             if self.is_persisted():
-                if self.verbose:
-                    print('persisted', self.node_uid)
-
                 data_dim = self.get_persisted_data_dim_as_str()
                 self.graph_dict[self.node_uid]['data_dim'] = data_dim
 
