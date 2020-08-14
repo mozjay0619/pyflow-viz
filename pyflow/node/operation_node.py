@@ -3,10 +3,11 @@ from .base_node import BaseNode
 
 class OperationNode(BaseNode):
     
-    def __init__(self, graph_uid, graph_alias, node_uid, function, n_out, verbose=False, alias=None, graph_dict=None):
+    def __init__(self, graph_uid, graph_alias, node_uid, function, function_signature, n_out, verbose=False, alias=None, graph_dict=None):
         super(OperationNode, self).__init__(graph_uid, graph_alias, node_uid, 'operation', verbose, alias or function.__name__)
         
         self.function = function
+        self.function_signature = function_signature
         self.n_out = n_out
         self.is_active = False
 
@@ -48,10 +49,27 @@ class OperationNode(BaseNode):
                                     for parent_data_node_weak_ref 
                                     in self.parent_node_weak_refs]
 
+        # for v0.32
+        # reconstruct args and kwargs 
+        args = []
+        kwargs = {}
+
+        for key, val in zip(self.function_signature, parent_data_nodes_values):
+
+            if key is None:
+                args.append(val)
+
+            else:
+                kwargs[key] = val
+
         if self.verbose:
             print('running {}'.format(self.node_uid))
 
-        output_values = self.function(*parent_data_nodes_values)
+        output_values = self.function(*args, **kwargs)
+
+        # for v0.32
+        # desired state: output_values = self.function(*parent_data_nodes_values, **parent_named_data_nodes_values)
+        # perhaps we want to keep track of the names and non-names
         
         if self.n_out > 1:
             for i, output_value in enumerate(output_values):

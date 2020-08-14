@@ -88,11 +88,27 @@ class GraphBuilder():
         
         return self
     
-    def __call__(self, *args):
+    def __call__(self, *args, **kwargs):
 
         # Create/update the graph using doubly linked list data structure
 
         op_node_uid = '{}_{}'.format(self.method_alias or self.func.__name__, self.node_count)
+
+        # for v0.32
+        # the names should be characteristics of the method not the inputs
+        # the same input data can go in under different names for different methods
+        # it ought to be part of the definition of the method signature
+        # therefore, the name list must belong to the operation node and not the data node
+        input_values = []
+        input_names = []
+
+        for val in args:
+            input_values.append(val)
+            input_names.append(None)
+            
+        for key, val in kwargs.items():
+            input_values.append(val)
+            input_names.append(key)
 
         # create op node to hold the input function method
         self.strong_ref_dict[op_node_uid] = OperationNode(
@@ -100,6 +116,7 @@ class GraphBuilder():
             graph_alias=self.graph_alias, 
             node_uid=op_node_uid, 
             function=self.func, 
+            function_signature=input_names,
             n_out=self.n_out, 
             verbose=self.verbose, 
             alias=self.method_alias,
@@ -108,17 +125,17 @@ class GraphBuilder():
         self.node_count += 1  
 
         # create edge: parent data_nodes <--> op_node
-        for i, inp in enumerate(args):
+        for i, inp in enumerate(input_values):
             
             # if the inp is actually another node:
             if isinstance(inp, ExtendedRef) and isinstance(inp(), DataNode):
 
                 # inp is already (a weak reference to) a data node
 
-                # add the weak ref to the parent data node to the op node's references
+                # add the weak ref to the parent data node to the op node's references as a parent
                 op_node_weak_ref().parent_node_weak_refs.append(inp)  
 
-                # add the weak reference of the current op node to the parent data node's references 
+                # add the weak reference of the current op node to the parent data node's references as a child
                 inp().child_node_weak_refs.append(op_node_weak_ref)
 
             # if the inp is raw data, and not another data node
@@ -143,7 +160,7 @@ class GraphBuilder():
 
                 # set the value of the new data node with the input inp value
                 data_node_weak_ref().set_value(inp)
-                
+             
                 # add the weak ref to the parent data node (newly created) to the op node's references
                 op_node_weak_ref().parent_node_weak_refs.append(data_node_weak_ref)
 
