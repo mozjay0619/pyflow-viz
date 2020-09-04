@@ -8,6 +8,13 @@ def adding(a, b):
 def multioutput_adding(a, b):
     return a + b, a
 
+def adding_kwarg(a, b, c=4):
+    
+    if c:
+        return a + b + c
+    else:
+        return a + b
+        
 def test_simple_graph():
     """GraphBuilder instance taking raw inputs"""
 
@@ -167,4 +174,84 @@ def test_multi_graph_with_persist():
     assert(~a4.has_value())
     assert(~a5.has_value())
     assert(a6.has_value())
+    
+def test_default_kwargs():
+    """Test default keyword arguments"""
+
+    G = GraphBuilder()
+    a1 = G.add(adding)(1, 2)
+    a2 = G.add(adding)(a1, 2)
+    a3 = G.add(adding_kwarg)(a1, a2)
+
+    assert(a3.get() == 12)
+    
+def test_kwargs_arguments():
+    """Test passing in keyword arguments"""
+
+    G = GraphBuilder()
+    a1 = G.add(adding)(1, 2)
+    a2 = G.add(adding)(a1, 2)
+    a3 = G.add(adding_kwarg)(a=a1, b=a2, c=10)
+
+    assert(a3.get() == 18)
+    
+def test_kwargs_None_arguments():
+    """Test None keyword argument input"""
+
+    G = GraphBuilder()
+    a1 = G.add(adding)(1, 2)
+    a2 = G.add(adding)(a1, 2)
+    a3 = G.add(adding_kwarg)(a=a1, b=a2, c=None)
+
+    assert(a3.get() == 8)
+    
+def test_args_None_arguments():
+    """Test None positional argument input"""
+
+    G = GraphBuilder()
+    a1 = G.add(adding)(1, 2)
+    a2 = G.add(adding)(a1, 2)
+    a3 = G.add(adding_kwarg)(a1, a2, None)
+
+    assert(a3.get() == 8)
+    
+def test_kwargs_None_arguments_multi_graph():
+    """Test None keyword/positional argument input in multiple graph paradigm"""
+
+    G = GraphBuilder()
+    a1 = G.add(adding)(1, 2)
+    a2 = G.add(adding)(a1, 2)
+    a3 = G.add(adding_kwarg)(a=a1, b=a2, c=None)
+
+    H = GraphBuilder()
+    a4 = H.add(adding)(a3, 1)
+    a5 = H.add(adding)(a4, 2)
+    a6 = G.add(adding_kwarg)(a4, a5, None)
+
+    assert(a6.get() == 20)
+    
+def test_kwargs_None_arguments_multi_graph_with_persist():
+    """Test None keyword argument input in multiple graph paradigm with persist"""
+
+    G = GraphBuilder()
+    a1 = G.add(adding)(1, 2)
+    a2 = G.add(adding)(a1, 2)
+    a3 = G.add(adding_kwarg, persist=True)(a=a1, b=a2, c=None)
+
+    H = GraphBuilder()
+    a4 = H.add(adding)(a3, 1)
+    a5 = H.add(adding)(a4, 2)
+    a6 = H.add(adding)(a4, a5)
+
+    a6.get()
+
+    assert(~a1.has_value())
+    assert(~a2.has_value())
+    assert(a3.has_value())
+
+    assert(~a4.has_value())
+    assert(~a5.has_value())
+    assert(a6.has_value())
+
+    assert(a6.get() == 20)
     

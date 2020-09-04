@@ -6,7 +6,7 @@ import warnings
 
 class DataNode(BaseNode):
     
-    def __init__(self, graph_uid, graph_alias, node_uid, value=None, persist=False, verbose=False, alias=None, graph_dict=None):
+    def __init__(self, graph_uid, graph_alias, node_uid, value="__specialPFV__NoneData", persist=False, verbose=False, alias=None, graph_dict=None):
         super(DataNode, self).__init__(graph_uid, graph_alias, node_uid, 'data', verbose, alias or 'data')
         
         self.value_holder = DataHolderNode(graph_uid, graph_alias, self.node_uid, value, self.verbose)
