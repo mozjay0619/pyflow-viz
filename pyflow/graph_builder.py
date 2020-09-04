@@ -141,8 +141,6 @@ class GraphBuilder():
             # if the inp is raw data, and not another data node
             else:
 
-                print(inp, 'asdf')
-
                 parent_data_node_uid = 'data_{}'.format(self.node_count)  # raw data has no alias
 
                 # if inp is raw value, we need to persist since we can't re-compute it from graph
