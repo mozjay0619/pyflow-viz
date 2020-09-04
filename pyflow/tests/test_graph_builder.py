@@ -10,8 +10,11 @@ def multioutput_adding(a, b):
 
 def adding_kwarg(a, b, c=4):
     
-    return a + b + c
-
+    if c:
+        return a + b + c
+    else:
+        return a + b
+        
 def test_simple_graph():
     """GraphBuilder instance taking raw inputs"""
 
