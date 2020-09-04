@@ -6,7 +6,7 @@ import pandas as pd
 
 class DataHolderNode(BaseNode):
     
-    def __init__(self, graph_uid, graph_alias, node_uid, value=None, verbose=False):
+    def __init__(self, graph_uid, graph_alias, node_uid, value="__specialPFV__NoneData", verbose=False):
         super(DataHolderNode, self).__init__(graph_uid, graph_alias, node_uid, 'data_holder', verbose)
 
         self.value = value
@@ -19,7 +19,7 @@ class DataHolderNode(BaseNode):
         self.value = value
     
     def has_value(self):
-        return self.value is not None
+        return self.value is not "__specialPFV__NoneData"
 
     def get_persisted_data_dim_as_str(self):
         """Currently supports dimensionality from:
