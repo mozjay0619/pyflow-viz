@@ -32,18 +32,22 @@ class BaseNode(object):
     def remove_dead_parent_nodes(self):
 
         self.parent_node_weak_refs = [elem for elem in self.parent_node_weak_refs if elem() is not None]
-        
-    def has_parent_node_weak_refs(self):
-
-        return len(self.parent_node_weak_refs) > 0
     
     def get_parent_node_weak_refs(self):
 
         return self.parent_node_weak_refs
+
+    def has_parent_node_weak_refs(self):
+
+        return len(self.parent_node_weak_refs) > 0
         
     def get_child_node_weak_refs(self):
 
         return self.child_node_weak_refs
+
+    def has_child_node_weak_refs(self):
+
+        return len(self.child_node_weak_refs) > 0
     
     def get_node_uid(self):
 
