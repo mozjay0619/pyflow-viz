@@ -110,7 +110,7 @@ class OperationNode(BaseNode):
                 # but if this child op node has no return values, 
                 # then we assume that this parent data node is still needed by the op node
                 # and therefore we do not release it
-                if not child_op_node_weak_ref().get_child_node_weak_refs():
+                if not child_op_node_weak_ref().has_child_node_weak_refs():
 
                     if self.verbose:
                         print('{} still needed at {}'.format(parent_data_node_weak_ref().get_node_uid(), 
