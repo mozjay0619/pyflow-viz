@@ -105,6 +105,22 @@ class OperationNode(BaseNode):
                 # also, we do not care about the status of data nodes under this op node
                 if not child_op_node_weak_ref().is_activated():
                     continue
+
+                # if the child op node of this parent data node is activated (by prior check)
+                # but if this child op node has no return values, 
+                # then we assume that this parent data node is still needed by the op node
+                # and therefore we do not release it
+                if not child_op_node_weak_ref().get_child_node_weak_refs():
+
+                    if self.verbose:
+                        print('{} still needed at {}'.format(parent_data_node_weak_ref().get_node_uid(), 
+                                                             child_op_node_weak_ref().get_node_uid()))
+
+                    # at this point, we don't need to check any other child op node of 
+                    # this parent data node.
+                    # however, we may need to check the next parent_data_node_weak_ref
+                    release_parent_data_node = False
+                    break
                 
                 # now traversing down to the data nodes of the op node
                 # if any of the data nodes are not filled, we need the current data node
@@ -119,6 +135,7 @@ class OperationNode(BaseNode):
                         
                         # for op node with one output data node, this weakref is referring to the
                         # output node it just computed for
+
                         if self.verbose:
                             print('{} still needed at {}'.format(parent_data_node_weak_ref().get_node_uid(), 
                                                                  child_op_node_weak_ref().get_node_uid()))
