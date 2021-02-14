@@ -118,7 +118,7 @@ class OperationNode(BaseNode):
 
                     # at this point, we don't need to check any other child op node of 
                     # this parent data node.
-                    # however, we may need to check the next parent_data_node_weak_ref
+                    # however, we may need to check the next parent_data_node_weak_ref of this op node
                     release_parent_data_node = False
                     break
                 
@@ -142,7 +142,7 @@ class OperationNode(BaseNode):
 
                         # at this point, we don't need to check any other child op node of 
                         # this parent data node.
-                        # however, we may need to check the next parent_data_node_weak_ref
+                        # however, we may need to check the next parent_data_node_weak_ref of this op node
                         release_parent_data_node = False
                         break
                 
