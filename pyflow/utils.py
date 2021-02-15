@@ -4,15 +4,18 @@ import os
 import ast
 import inspect
 import textwrap
+import sys
 
 from graphviz import Digraph
 import graphviz
 
+MAX_INTEGER = sys.maxsize 
+
 
 class ExtendedRef(weakref.ref):
 
-    def get(self):
-        return self().get()
+    def get(self, view=False, summary=True):
+        return self().get(view, summary)
     
     def get_node_uid(self):
         return self().get_node_uid()
@@ -41,11 +44,15 @@ def view_full(graph_dict, graph_attributes, verbose, current_graph_uid):
     
     ranks = set()
 
+
+
     for node_properties_dict in graph_dict.values():
         
         rank = get_rank(node_properties_dict)
         if rank is not None:
             ranks.add(rank)
+
+
 
     ranks = list(ranks)
     ranks.sort()
@@ -99,13 +106,21 @@ def view_full(graph_dict, graph_attributes, verbose, current_graph_uid):
                     shape = 'record'
                     data_dim = v['data_dim']
                     label = "{{{}|{}}}".format(label, data_dim)
+
+                # UPDATED: 0.35
+                if v['is_activated']:
+                    pencolor = 'lawngreen'
+                    penwidth = '1.75'
+                else:
+                    pencolor = None
+                    penwidth = None
                             
                 subg.node(
                     k, 
                     label=label, 
                     shape=shape, 
                     fontsize=fontsize, 
-                    height=shapesize, width=shapesize, fillcolor=color, style='filled')
+                    height=shapesize, width=shapesize, fillcolor=color, style='filled', color=pencolor, penwidth=penwidth)
 
                 for child in v['children']:
 
@@ -118,13 +133,22 @@ def view_full(graph_dict, graph_attributes, verbose, current_graph_uid):
 
                     else:
                         shape = graph_attributes['data_node_shape']
+
+                    # UPDATED: 0.35
+                    if graph_dict[child]['is_activated']:
+                        pencolor = 'lawngreen'
+                        penwidth = '1.75'
+                    else:
+                        pencolor = None
+                        penwidth = None
                     
                     graph.node(
                         child, 
                         label=label,
                         shape=graph_attributes['data_node_shape'], 
                         fontsize=graph_attributes['data_node_fontsize'], 
-                        height='0.0', width='0.0')
+                        height='0.0', width='0.0',
+                        color=pencolor, penwidth=penwidth)
                     graph.edge(k, child)
 
                 for parent in v['parents']:
@@ -139,12 +163,21 @@ def view_full(graph_dict, graph_attributes, verbose, current_graph_uid):
                     else:
                         shape = graph_attributes['data_node_shape']
 
+                    # UPDATED: 0.35
+                    if graph_dict[parent]['is_activated']:
+                        pencolor = 'lawngreen'
+                        penwidth = '1.75'
+                    else:
+                        pencolor = None
+                        penwidth = None
+
                     graph.node(
                         parent, 
                         label=label,
                         shape=graph_attributes['data_node_shape'], 
                         fontsize=graph_attributes['data_node_fontsize'], 
-                        height='0.0', width='0.0')
+                        height='0.0', width='0.0',
+                        color=pencolor, penwidth=penwidth)
                     graph.edge(parent, k)
 
     for k, v in unranked_subgraph.items():
@@ -185,12 +218,20 @@ def view_full(graph_dict, graph_attributes, verbose, current_graph_uid):
             data_dim = v['data_dim']
             label = "{{{}|{}}}".format(label, data_dim)
 
+        # UPDATED: 0.35
+        if v['is_activated']:
+            pencolor = 'lawngreen'
+            penwidth = '1.75'
+        else:
+            pencolor = None
+            penwidth = None
+
         graph.node(
             k, 
             label=label, 
             shape=shape, 
             fontsize=fontsize, 
-            height=shapesize, width=shapesize, fillcolor=color, style='filled')
+            height=shapesize, width=shapesize, fillcolor=color, style='filled', color=pencolor, penwidth=penwidth)
 
         for child in v['children']:
 
@@ -206,12 +247,21 @@ def view_full(graph_dict, graph_attributes, verbose, current_graph_uid):
             else:
                 shape = graph_attributes['data_node_shape']
 
+            # UPDATED: 0.35
+            if graph_dict[child]['is_activated']:
+                pencolor = 'lawngreen'
+                penwidth = '1.75'
+            else:
+                pencolor = None
+                penwidth = None
+
             graph.node(
                 child,
                 label=label,
                 shape=shape, 
                 fontsize=graph_attributes['data_node_fontsize'], 
-                height='0.0', width='0.0', fillcolor=color)
+                height='0.0', width='0.0', fillcolor=color,
+                color=pencolor, penwidth=penwidth)
             graph.edge(k, child)
 
         for parent in v['parents']:
@@ -226,20 +276,30 @@ def view_full(graph_dict, graph_attributes, verbose, current_graph_uid):
             else:
                 shape = graph_attributes['data_node_shape']
 
+            # UPDATED: 0.35
+            if graph_dict[parent]['is_activated']:
+                pencolor = 'lawngreen'
+                penwidth = '1.75'
+            else:
+                pencolor = None
+                penwidth = None
+
             graph.node(
                 parent,
                 label=label,
                 shape=shape, 
                 fontsize=graph_attributes['data_node_fontsize'], 
-                height='0.0', width='0.0', fillcolor=color)
+                height='0.0', width='0.0', fillcolor=color,
+                color=pencolor, penwidth=penwidth)
             graph.edge(parent, k)
 
     return graph
 
 def view_summary(graph_dict, graph_attributes, verbose, current_graph_uid):
     
-    op_subgraphs = {k: v for k, v in graph_dict.items() if 'operation' == v['type']}
-    data_subgraphs = {k: v for k, v in graph_dict.items() if 'data' == v['type']}
+    op_subgraphs = {k: v for k, v in graph_dict.items() if 'type' in v and 'operation' == v['type']}
+
+    data_subgraphs = {k: v for k, v in graph_dict.items() if 'type' in v and 'data' == v['type']}
 
     op_graph_dict = copy.deepcopy(op_subgraphs)
 
@@ -266,6 +326,47 @@ def view_summary(graph_dict, graph_attributes, verbose, current_graph_uid):
                     op_graph_dict[k]['children'].append(child_op_node_uid)
 
     return view_full(op_graph_dict, graph_attributes, verbose, current_graph_uid)
+
+def preprocess_graph_dict(graph_dict, graph_uid, graph_attributes, activate_ext_graph):
+    """
+    1. support for multi graph
+    - need to create a copy of graph dict so that we can give it an appendage of graph node
+    """
+    copied_graph_dict = copy.deepcopy(graph_dict)
+
+    # UPDATED: 0.35
+    copied_graph_dict = {k: v for k, v in copied_graph_dict.items() if 'type' in v}
+
+    external_graphs_dict = {k: v for k, v in copied_graph_dict.items() if v['graph_uid']!=graph_uid}
+
+    for k, v in external_graphs_dict.items():
+
+        node_graph_attributes_dict = {'rank': MAX_INTEGER, 
+                                      'color': graph_attributes['graph_node_color'], 
+                                      'shape': graph_attributes['graph_node_shape'],
+                                      'fontsize': graph_attributes['graph_node_fontsize'],
+                                      'shapesize': graph_attributes['graph_node_shapesize']}
+
+        op_node_properties_dict = {'children': [k], 
+                                   'parents': [], 
+                                   'type': 'operation', 
+                                   'is_activated': activate_ext_graph,
+                                   'alias': v['graph_alias'],
+                                   'node_uid': k + "_ghost",
+                                   'graph_alias': v['graph_alias'],
+                                   'graph_uid': v['graph_uid'],
+                                   'attributes': node_graph_attributes_dict}
+
+        # UPDATED: 0.35
+        if activate_ext_graph:
+
+            v['is_activated'] = activate_ext_graph
+
+        v['parents'].append(k+"_ghost")
+        copied_graph_dict[k+"_ghost"] = op_node_properties_dict
+
+    sorted_graph_dict = topological_sort(copied_graph_dict)
+    return sorted_graph_dict
 
 def save_graph_image(graph, dirpath=None, filename=None, fileformat=None):
     

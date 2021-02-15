@@ -6,15 +6,17 @@ from .utils import view_summary
 from .utils import save_graph_image
 from .utils import contains_return_statement
 from .utils import topological_sort
+from .utils import preprocess_graph_dict
 # from .utils import add_to_module_global_namespace
 
 from collections import defaultdict
 from collections import Iterable
 import sys
 import copy
+from IPython.display import display
 
-MAX_INTEGER = sys.maxsize  
-
+ 
+MAX_INTEGER = sys.maxsize 
 
 class GraphBuilder():
     
@@ -213,6 +215,14 @@ class GraphBuilder():
                                    'parents': [], 
                                    'type': 'operation', 
                                    'is_persisted': False,
+
+                                   # UPDATED: 0.35
+                                   # activated graph property is for visualization only
+                                   # no node is activated at the time of creation
+                                   # the object activation still only applies to operation nodes
+
+                                   'is_activated': False,
+
                                    'data_dim': '',
                                    'alias': op_node_weak_ref().alias,
                                    'node_uid': op_node_weak_ref().node_uid,
@@ -248,6 +258,7 @@ class GraphBuilder():
                                             'parents': [],  
                                             'type': 'data',
                                             'is_persisted': parent_data_node_weak_ref().is_persisted(),
+                                            'is_activated': False,
                                             'data_dim': parent_data_node_weak_ref().get_persisted_data_dim_as_str(),
                                             'alias': parent_data_node_weak_ref().alias,
                                             'node_uid': _ext_node_uid,
@@ -284,6 +295,7 @@ class GraphBuilder():
                                         'parents': [], 
                                         'type': 'data',
                                         'is_persisted': parent_data_node_weak_ref().is_persisted(),
+                                        'is_activated': False,
                                         'data_dim': data_dim,
                                         'alias': parent_data_node_weak_ref().alias,
                                         'node_uid': parent_data_node_weak_ref().node_uid,
@@ -316,6 +328,7 @@ class GraphBuilder():
                                         'parents': [], 
                                         'type': 'data', 
                                         'is_persisted': child_data_node_weak_ref().is_persisted(),
+                                        'is_activated': False,
                                         'data_dim': '',
                                         'alias': child_data_node_weak_ref().alias,
                                         'node_uid': child_data_node_weak_ref().node_uid,
@@ -362,6 +375,87 @@ class GraphBuilder():
             return args[0].get()
         else:
             return [arg.get() for arg in args]
+
+
+
+    def run_only(self, *args, view=False, summary=True):
+
+        data_node_uids = [elem().node_uid for elem in args if isinstance(elem, ExtendedRef)]
+        requested_data_nodes = [(k, v) for k, v in self.strong_ref_dict.items() if k in data_node_uids]
+
+        if view:
+
+            all_dependency_ancestor_node_uids = set()
+
+
+
+        for k, v in requested_data_nodes:
+
+            if view:
+
+                dependency_ancestor_node_weak_refs = v.get_all_dependency_ancestor_node_weak_refs()
+                dependency_ancestor_node_uids = [elem().node_uid for elem in dependency_ancestor_node_weak_refs if elem().graph_uid==self.graph_uid]
+
+                # without the last condition, the possible data_1 name from
+                # an external graph that is ancestor of the target data node
+                # will overlap with the data_1 of this current graph
+                # this will lead to highlighting of a data_1 from this graph
+                # even if that data_1 is not an ancestor
+
+                all_dependency_ancestor_node_uids.update(dependency_ancestor_node_uids)
+                all_dependency_ancestor_node_uids.update([k])
+
+            if v.has_value():
+                continue
+
+            v.shallowly_persist()
+            v.activate_dependency_op_nodes()
+
+        op_node_uids = [elem for elem in args if isinstance(elem, str)] 
+        requested_op_nodes = [(k, v) for k, v in self.strong_ref_dict.items() if '_'.join(k.split('_')[0:-1]) in op_node_uids]
+
+        for k, v in requested_op_nodes:
+            v.activate_dependency_op_nodes()
+
+            if view:
+
+                dependency_ancestor_node_weak_refs = v.get_all_dependency_ancestor_node_weak_refs()
+                dependency_ancestor_node_uids = [elem().node_uid for elem in dependency_ancestor_node_weak_refs]
+
+                all_dependency_ancestor_node_uids.update(dependency_ancestor_node_uids)
+                all_dependency_ancestor_node_uids.update([k])
+
+        if view:
+
+            graph_dict_copied = copy.deepcopy(self.graph_dict)
+
+            all_dependency_ancestor_node_uids = list(all_dependency_ancestor_node_uids)
+
+            for dependency_ancestor_node_uid in all_dependency_ancestor_node_uids:
+                
+                graph_dict_copied[dependency_ancestor_node_uid]['is_activated'] = True
+
+            preprocessed_graph_dict = preprocess_graph_dict(graph_dict_copied, self.graph_uid, self.graph_attributes, True)
+
+            if summary :
+                display(view_summary(preprocessed_graph_dict, self._graph_attributes(), verbose=self.verbose, current_graph_uid=self.graph_uid))
+            else:
+                display(view_full(preprocessed_graph_dict, self._graph_attributes(), verbose=self.verbose, current_graph_uid=self.graph_uid))
+
+
+        op_nodes = [(k, v) for k, v in self.strong_ref_dict.items() if v.node_type == 'operation' and v.is_activated()]
+
+        for k, v in op_nodes:
+            v.run()
+
+        data_args = [elem for elem in args if isinstance(elem, ExtendedRef)]
+
+        if len(data_args) == 1:
+            return data_args[0].get()
+        else:
+            return [data_arg.get() for data_arg in data_args]
+
+
 
     def remove(self, n=1):
 
@@ -446,43 +540,12 @@ class GraphBuilder():
 
         self.user_defined_graph_attributes = graph_attributes
 
-    def preprocess_graph_dict(self):
-        """
-        1. support for multi graph
-        - need to create a copy of graph dict so that we can give it an appendage of graph node
-        """
-        graph_dict = copy.deepcopy(self.graph_dict)
-        external_graphs_dict = {k: v for k, v in graph_dict.items() if v['graph_uid']!=self.graph_uid}
-
-        for k, v in external_graphs_dict.items():
-
-            node_graph_attributes_dict = {'rank': MAX_INTEGER, 
-                                          'color': self.graph_attributes['graph_node_color'], 
-                                          'shape': self.graph_attributes['graph_node_shape'],
-                                          'fontsize': self.graph_attributes['graph_node_fontsize'],
-                                          'shapesize': self.graph_attributes['graph_node_shapesize']}
-
-            op_node_properties_dict = {'children': [k], 
-                                       'parents': [], 
-                                       'type': 'operation', 
-                                       'alias': v['graph_alias'],
-                                       'node_uid': k + "_ghost",
-                                       'graph_alias': v['graph_alias'],
-                                       'graph_uid': v['graph_uid'],
-                                       'attributes': node_graph_attributes_dict}
-
-            v['parents'].append(k+"_ghost")
-            graph_dict[k+"_ghost"] = op_node_properties_dict
-
-        sorted_graph_dict = topological_sort(graph_dict)
-        return sorted_graph_dict
-
     def view(self, summary=True, graph_attributes=None):
 
         if graph_attributes:  # need validity check here
             self.update_graph_attributes(graph_attributes)
 
-        preprocessed_graph_dict = self.preprocess_graph_dict()
+        preprocessed_graph_dict = preprocess_graph_dict(self.graph_dict, self.graph_uid, self.graph_attributes, False)
         
         if summary:
             return view_summary(preprocessed_graph_dict, self._graph_attributes(), verbose=self.verbose, current_graph_uid=self.graph_uid)
