@@ -19,5 +19,6 @@ setup(
 	license="DSB 3-clause",
 	packages=find_packages(),
 	install_requires=["graphviz>=0.13.2", "bokeh>=2.0.1", "scipy>=1.4.1", 
-					  "scikit-image>=0.17.2", "numpy>=1.18.2", "pandas>=0.25.3"]
+					  "scikit-image>=0.17.2", "numpy>=1.18.2", "pandas>=0.25.3",
+					  "ipython"]
 	)
