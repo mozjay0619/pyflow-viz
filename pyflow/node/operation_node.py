@@ -35,6 +35,18 @@ class OperationNode(BaseNode):
             print('{} deactivated!'.format(self.node_uid))
             
         self.is_active = False
+
+    def activate_dependency_op_nodes(self):
+
+        self.activate()
+        
+        dependency_ancestor_node_weak_refs = self.get_dependency_ancestor_node_weak_refs()
+        dependency_op_nodes_weak_refs = [elem for elem in dependency_ancestor_node_weak_refs 
+                                  if elem().node_type == 'operation']
+        
+        for dependency_op_node_weak_ref in dependency_op_nodes_weak_refs:
+            dependency_op_node_weak_ref().activate()
+
         
     def run(self):
         """run method will do four things with respect to the current op node

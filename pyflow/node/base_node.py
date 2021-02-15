@@ -52,15 +52,15 @@ class BaseNode(object):
     def get_node_uid(self):
 
         return self.node_uid
-    
-    def get_ancestor_node_weak_refs(self):
+
+    def get_dependency_ancestor_node_weak_refs(self):
 
         ancestors_weak_refs = list()
-        DataNode._get_ancestor_node_weak_refs(self, ancestors_weak_refs)
+        BaseNode._get_dependency_ancestor_node_weak_refs(self, ancestors_weak_refs)
         return ancestors_weak_refs
     
     @staticmethod
-    def _get_ancestor_node_weak_refs(self, acc):
+    def _get_dependency_ancestor_node_weak_refs(self, acc):
         """
         all data nodes needed that has no values,
         all op until valued data nodes
@@ -74,7 +74,32 @@ class BaseNode(object):
                 
                 if parent_node_weak_ref not in acc:
                     acc.append(parent_node_weak_ref)
-                BaseNode._get_ancestor_node_weak_refs(parent_node_weak_ref(), acc)
+                BaseNode._get_dependency_ancestor_node_weak_refs(parent_node_weak_ref(), acc)
+
+            else:
+
+                acc.append(parent_node_weak_ref)
+
+    def get_all_dependency_ancestor_node_weak_refs(self):
+
+        ancestors_weak_refs = list()
+        BaseNode._get_all_dependency_ancestor_node_weak_refs(self, ancestors_weak_refs)
+
+        return ancestors_weak_refs
+
+    @staticmethod
+    def _get_all_dependency_ancestor_node_weak_refs(self, acc):
+        """
+        all data nodes needed that has no values,
+        all op until valued data nodes
+        """
+        for parent_node_weak_ref in self.get_parent_node_weak_refs():
+
+            if parent_node_weak_ref().has_parent_node_weak_refs():
+                
+                if parent_node_weak_ref not in acc:
+                    acc.append(parent_node_weak_ref)
+                BaseNode._get_all_dependency_ancestor_node_weak_refs(parent_node_weak_ref(), acc)
 
             else:
 

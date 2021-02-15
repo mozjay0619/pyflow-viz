@@ -1,8 +1,12 @@
 from .base_node import BaseNode
 from .data_holder_node import DataHolderNode
 
-import warnings
+from ..utils import view_full
+from ..utils import view_summary
 
+import warnings
+import copy
+from IPython.display import display
 
 class DataNode(BaseNode):
     
@@ -18,6 +22,7 @@ class DataNode(BaseNode):
         self.graph_dict = graph_dict
 
         self.shallow_persist = False
+        self.is_active = False
 
     def set_value(self, value):
         
@@ -50,15 +55,55 @@ class DataNode(BaseNode):
         else:
             return ''
 
-    def get(self):
+    def view_activated(self, summary):
+
+        dependency_ancestor_node_weak_refs = self.get_all_dependency_ancestor_node_weak_refs()
+        dependency_ancestor_node_uids = [elem().node_uid for elem in dependency_ancestor_node_weak_refs]
+
+        dependency_ancestor_node_uids += [self.node_uid]
+
+        graph_dict_copied = copy.deepcopy(self.graph_dict)
+
+        for dependency_ancestor_node_uid in dependency_ancestor_node_uids:
+            
+            graph_dict_copied[dependency_ancestor_node_uid]['is_activated'] = True
+
+        _graph_attributes = {'data_node_fontsize': '10',
+                             'data_node_shape': 'box',
+                             'data_node_color': 'None',
+                             'op_node_fontsize': '12',
+                             'op_node_shape': 'box',
+                             'op_node_color': 'white',
+                             'graph_ranksep': '0.415',
+                             'graph_node_fontsize': '12.85',
+                             'graph_node_shape': 'box3d',
+                             'graph_node_color': 'white',
+                             'graph_node_shapesize': '0.574',
+                             'persist_record_shape': 'True'}
+
+        if summary :
+            display(view_summary(graph_dict_copied, _graph_attributes, verbose=self.verbose, current_graph_uid=self.graph_uid))
+        else:
+            display(view_full(graph_dict_copied, _graph_attributes, verbose=self.verbose, current_graph_uid=self.graph_uid))
+
+    def get(self, view=False, summary=True):
 
         # this is to support the multi-graph paradigm
         self.remove_dead_child_nodes()
         
         if self.value_holder.has_value():
 
-            if self.verbose and self.is_shallowly_persisted():
-                print('{} has been shallowly persisted'.format(self.node_uid))
+            if view:
+                self.view_activated(summary)
+                
+            if self.verbose:
+                if self.is_shallowly_persisted():
+                    print('{} has been shallowly persisted'.format(self.node_uid))
+                elif self.is_persisted():
+                    print('{} has been persisted'.format(self.node_uid))
+                elif self.has_value():
+                    print('{} has been computed'.format(self.node_uid))
+
 
             # update graph_dict 
             # during a computation execution, the value_holder can hold transient data
@@ -69,12 +114,19 @@ class DataNode(BaseNode):
                 self.graph_dict[self.node_uid]['data_dim'] = data_dim
 
             return self.value_holder.get()
+
         else:
+
+            self.activate_dependency_op_nodes()
+            
+            if view:
+
+                self.view_activated(summary)
+
             if self.verbose:
                 print('computing for {}'.format(self.node_uid))
-            
-            self.activate_dependency_op_nodes()
-            self.parent_node_weak_refs[0]().run()
+
+            self.parent_node_weak_refs[0]().run()  # a data node can only have 1 op parent node
 
             # update graph_dict
             if self.is_persisted():
@@ -91,33 +143,6 @@ class DataNode(BaseNode):
         
         for dependency_op_node_weak_ref in dependency_op_nodes_weak_refs:
             dependency_op_node_weak_ref().activate()
-
-    def get_dependency_ancestor_node_weak_refs(self):
-
-        ancestors_weak_refs = list()
-        DataNode._get_dependency_ancestor_node_weak_refs(self, ancestors_weak_refs)
-        return ancestors_weak_refs
-    
-    @staticmethod
-    def _get_dependency_ancestor_node_weak_refs(self, acc):
-        """
-        all data nodes needed that has no values,
-        all op until valued data nodes
-        """
-        for parent_node_weak_ref in self.get_parent_node_weak_refs():
-
-            if parent_node_weak_ref().node_type == 'data' and parent_node_weak_ref().has_value():
-                continue
-
-            if parent_node_weak_ref().has_parent_node_weak_refs():
-                
-                if parent_node_weak_ref not in acc:
-                    acc.append(parent_node_weak_ref)
-                DataNode._get_dependency_ancestor_node_weak_refs(parent_node_weak_ref(), acc)
-
-            else:
-
-                acc.append(parent_node_weak_ref)
 
     def release_memory(self):
         
