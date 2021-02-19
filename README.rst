@@ -54,7 +54,7 @@ You can pass in data nodes to get the desired results back this way:
 
 	a1_result, a3_result = G.run(a1, a3)  # will run all the operation nodes, and return the result data values of a1, a3
 
-But what if you don't want to run every method in the DAG but just a few? There is ``run_only`` method for that, which we will learn shortly.
+But what if you don't want to run every method in the DAG? There is ``run_only`` method for that, which we will learn shortly.
 
 A couple notes:
 
