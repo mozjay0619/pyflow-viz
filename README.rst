@@ -166,7 +166,7 @@ But since at a conceptual level, queries are similarly progenitors of new data, 
    :width: 10pt
 
 
-But then we might want to make the DAG a little shorter, especially if we are to add more and more intermediate steps. We can control more detailed aesthetics with ``graph_attributes``:
+But then we might want to make the DAG a little shorter, especially if we are to add more and more intermediate steps. We can control more detailed aesthetics with ``graph_attributes`` (the ``gap`` is simply the short cut parameter for this!):
 
 .. code:: python
 
