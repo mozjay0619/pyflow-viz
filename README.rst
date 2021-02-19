@@ -32,13 +32,15 @@ Let's construct a simple computation graph: (Note the similarity of API to that 
 
 At this point, no evaluation has occurred. The outputs ``a1``, ``a2``, and ``a3`` are ``DataNode`` objects. The methods that we just added are ``OperationNode`` objects of the DAG.
 
-You can also easily visualize the DAG using ``view`` method:
+You can easily visualize the resulting DAG using ``view`` method:
 
 .. code:: python
 
 	G.view()
 
 .. figure:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/simple_dag.png
+
+The default setting of the ``view`` method will only visualize the operation nodes. But ``view`` can do much more, as we will learn shortly.
 
 You can execute the computation graph by invoking ``run`` method:
 
