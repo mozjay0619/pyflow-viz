@@ -227,16 +227,16 @@ The default alias for operation node is the String name of the method being pass
 Executing part of graph
 -----------------------
 
-The ``run`` method will execute all nodes in the graph, but what if you just want to run parts of the graph to save yourself time? Let's look at an example:
+The ``run`` method will execute all nodes in the graph, but what if you don't want to run every node in the graph to save yourself time? Let's look at an example:
 
 .. code:: python
 
 	from pyflow import GraphBuilder
 
 	def query_dataA():
-	    return 3
+	    return 1
 	def query_dataB():
-	    return 3
+	    return 2
 	def query_dataC():
 	    return 3
 	def transform_dataA(a):
@@ -268,7 +268,19 @@ The ``run`` method will execute all nodes in the graph, but what if you just wan
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/for_partial1.png
    :width: 10pt
 
+In the above graph, let's say you are testing the ``transform_dataA`` method. For this purpose, you only need to run ``query_dataA`` and ``transform_dataA``. In such a case, you can use the ``run_only`` method:
 
+.. code:: python
+
+	a_result = G.run_only(a)  # 1
+
+When you invoke the ``run_only`` method, Pyflow will only execute parts of the graph that has the data dependency to the asked node. 
+
+In the above graph, let's say you are testing the ``save_dataAB`` method. But to execute this node, you don't really need to execute ``query_dataC``, ``transform_dataC``, and ``join_dataC``. In such a case, you can use the ``run_only`` method:
+
+.. code:: python
+
+	G.run_only('save_dataAB')
 
 
 
