@@ -224,6 +224,70 @@ Finally, you can set the alias of the nodes by passing in ``method_alias`` and/o
 The default alias for operation node is the String name of the method being passed in, and the default alias for data node is simply "data". We do not include the example of setting ``method_alias`` to discourage its use. Setting method alias different from the method name will make look up of graph node in the code base very difficult. 
 
 
+No output methods
+-----------------
+
+Often when we are processing data, we will end up doing something with that data, whether it is to upload it somewhere, save it somewhere, or use pass it to a model, etc. In those cases, we do not expect any return data. 
+
+.. code:: python
+	
+	# this method does not have return statement
+	def save_data(data):
+
+		# save the data somewhere
+		# no return statement needed
+		pass
+
+Pyflow will create graph accordingly, such that the outputless operation node is a leaf node. 
+
+.. code:: python
+
+	from pyflow import GraphBuilder
+
+	def query_dataframe_A():
+		return 1  # pretend this was a pandas or Spark dataframe!
+
+	def query_dataframe_B():
+		return 2
+
+	def product_transform(inp):
+		return inp*2
+
+	def join_transform(inp1, inp2):
+		return inp1 + inp2
+
+	def split_transform(inp):
+		return inp+1, inp+2
+
+	def save_data(data):
+		# save the data somewhere
+		# no return statement needed
+		pass
+
+	G = GraphBuilder()
+	df1 = G.add(query_dataframe_A, rank=0, shape='cylinder', color='lightblue')()
+	df2 = G.add(query_dataframe_B, rank=0, shape='cylinder', color='lightblue')()
+	new_df1 = G.add(product_transform)(df1)
+	new_df2 = G.add(product_transform)(df2)
+	dfa, dfb = G.add(split_transform, n_out=2)(new_df2)
+	joined_df = G.add(join_transform)(new_df1, dfa)
+	G.add(save_data)(dfb)
+	G.add(save_data)(joined_df)
+
+	graph_attributes = {'graph_ranksep': 0.25}
+	G.view(summary=False, graph_attributes=graph_attributes)
+
+
+.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/no_output_.png
+   :width: 10pt
+
+
+This is a more realistic shape of the DAG in the actual use case of data preprocessing. Also, this is why ``run`` method makes more sense to use then ``get`` method in most realistic use cases. As you can see above, there is no data node from which we can call ``get`` method to retrieve the data. We are not interested in the data per se as we are in what we can do with the data. And most of the time, when we do something with our data, the end result is not another data. This does not mean you shouldn't use ``get``. There might be situations where you would want to get the data back, especially during interactive sessions. 
+
+
+
+
+
 Executing parts of graph
 -----------------------
 
@@ -314,67 +378,6 @@ This method also supports other parameters of ``view`` method:
 
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/dep3.png
    :width: 10pt
-
-No output methods
------------------
-
-Often when we are processing data, we will end up doing something with that data, whether it is to upload it somewhere, save it somewhere, or use pass it to a model, etc. In those cases, we do not expect any return data. 
-
-.. code:: python
-	
-	# this method does not have return statement
-	def save_data(data):
-
-		# save the data somewhere
-		# no return statement needed
-		pass
-
-Pyflow will create graph accordingly, such that the outputless operation node is a leaf node. 
-
-.. code:: python
-
-	from pyflow import GraphBuilder
-
-	def query_dataframe_A():
-		return 1  # pretend this was a pandas or Spark dataframe!
-
-	def query_dataframe_B():
-		return 2
-
-	def product_transform(inp):
-		return inp*2
-
-	def join_transform(inp1, inp2):
-		return inp1 + inp2
-
-	def split_transform(inp):
-		return inp+1, inp+2
-
-	def save_data(data):
-		# save the data somewhere
-		# no return statement needed
-		pass
-
-	G = GraphBuilder()
-	df1 = G.add(query_dataframe_A, rank=0, shape='cylinder', color='lightblue')()
-	df2 = G.add(query_dataframe_B, rank=0, shape='cylinder', color='lightblue')()
-	new_df1 = G.add(product_transform)(df1)
-	new_df2 = G.add(product_transform)(df2)
-	dfa, dfb = G.add(split_transform, n_out=2)(new_df2)
-	joined_df = G.add(join_transform)(new_df1, dfa)
-	G.add(save_data)(dfb)
-	G.add(save_data)(joined_df)
-
-	graph_attributes = {'graph_ranksep': 0.25}
-	G.view(summary=False, graph_attributes=graph_attributes)
-
-
-.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/no_output_.png
-   :width: 10pt
-
-
-This is a more realistic shape of the DAG in the actual use case of data preprocessing. Also, this is why ``run`` method makes more sense to use then ``get`` method in most realistic use cases. As you can see above, there is no data node from which we can call ``get`` method to retrieve the data. We are not interested in the data per se as we are in what we can do with the data. And most of the time, when we do something with our data, the end result is not another data. This does not mean you shouldn't use ``get``. There might be situations where you would want to get the data back, especially during interactive sessions. 
-
 
 
 
