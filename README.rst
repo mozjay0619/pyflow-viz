@@ -268,7 +268,7 @@ The ``run`` method will execute all nodes in the graph, but what if you don't wa
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/for_partial1.png
    :width: 10pt
 
-In the above graph, let's say you are testing the ``transform_dataA`` method. For this purpose, you only need to run ``query_dataA`` and ``transform_dataA``. In such a case, you can use the ``run_only`` method:
+From the above graph, let's say you want to test the ``transform_dataA`` method. For this purpose, you only need to run ``query_dataA`` and ``transform_dataA``. In such a case, you can use the ``run_only`` method, instead of ``run`` method, which will execute every node in the graph:
 
 .. code:: python
 
@@ -276,13 +276,13 @@ In the above graph, let's say you are testing the ``transform_dataA`` method. Fo
 
 When you invoke the ``run_only`` method, Pyflow will only execute parts of the graph that has the data dependency to the asked node. 
 
-In the above graph, let's say you are testing the ``save_dataAB`` method. But to execute this node, you don't really need to execute ``query_dataC``, ``transform_dataC``, and ``join_dataC``. In such a case, you can use the ``run_only`` method:
+Now let's say you are testing the ``save_dataAB`` method. But this node does not have data node that we can use to pass into the ``run_only`` method. That's why you can also pass in the string of the node names into the ``run_only`` method:
 
 .. code:: python
 
-	G.run_only('save_dataAB')
+	a_result = G.run_only(a, 'save_dataAB') 
 
-
+In the above code, only the result for ``a`` node is returned because ``save_dataAB`` does not have a return statement. 
 
 
 Visualizing computation dependency
