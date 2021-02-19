@@ -30,7 +30,7 @@ Let's construct a simple computation graph: (Note the similarity of API to that 
 	a2 = G.add(adding)(3, a1)
 	a3 = G.add(adding)(a1, a2)
 
-At this point, no evaluation has occurred. The outputs ``a1``, ``a2``, and ``a3`` are ``DataNode`` objects (well, more precisely, weak references to the ``DataNode`` objects). The methods we just added have become ``OperationNode`` of the graph.
+At this point, no evaluation has occurred. The outputs ``a1``, ``a2``, and ``a3`` are ``DataNode`` objects. The methods we just added are ``OperationNode`` objects of the graph.
 
 You can execute the computation graph by invoking ``run`` method:
 
