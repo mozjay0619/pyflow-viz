@@ -223,9 +223,54 @@ Finally, you can set the alias of the nodes by passing in ``method_alias`` and/o
 
 The default alias for operation node is the String name of the method being passed in, and the default alias for data node is simply "data". We do not include the example of setting ``method_alias`` to discourage its use. Setting method alias different from the method name will make look up of graph node in the code base very difficult. 
 
+
+Executing part of graph
+-----------------------
+
+The ``run`` method will execute all nodes in the graph, but what if you just want to run parts of the graph to save yourself time? Let's look at an example:
+
+.. code:: python
+
+	from pyflow import GraphBuilder
+
+	def query_dataA():
+	    return 3
+	def query_dataB():
+	    return 3
+	def query_dataC():
+	    return 3
+	def transform_dataA(a):
+	    return a
+	def transform_dataB(a):
+	    return a
+	def transform_dataC(a):
+	    return a
+	def join_dataAB(a, b):
+	    return a + b
+	def save_dataAB(ab):
+	    pass
+	def join_dataC(a, c):
+	    return a + c
+
+	G = GraphBuilder()    
+	a = G.add(query_dataA, rank=0)()
+	b = G.add(query_dataB, rank=0)()
+	c = G.add(query_dataC, rank=0)()
+	a = G.add(transform_dataA)(a)
+	b = G.add(transform_dataB)(b)
+	c = G.add(transform_dataC)(c)
+	ab = G.add(join_dataAB)(a, b)
+	G.add(save_dataAB)(ab)
+	abc = G.add(join_dataC)(ab, c)
+
+	G.view(gap=0.25)
+
+
+
 Visualizing computation dependency
 ----------------------------------
 
+When asked to compute something, Pyflow will only execute parts of the graph that has data dependency. We can visualize this dependency with ``view_dependency`` method. 
 
 
 
