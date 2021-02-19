@@ -2,7 +2,7 @@
 Pyflow
 ======
 
-Pyflow is a light weight library that lets the user construct a memory efficient directed acyclic computation graph (DAG) that evaluates lazily. It can cache intermediate results, only compute the parts of the graph that has data dependency, and immediately release memory of data whose dependecy is no longer required. Pyflow is simple and light, built purely on Python, using the weak references for memory management and doubly linked list for DAG construction. 
+Pyflow is a light weight library that lets the user construct a directed acyclic computation graph (DAG) that evaluates lazily. It can cache intermediate results, only compute the parts of the graph that has data dependency, and immediately release memory of data whose dependecy is no longer required. Pyflow is simple and light, built purely on Python, using the weak references for memory management and doubly linked list for DAG construction. 
 
 Unlike computation graph based engines such as Dask or PySpark, Pyflow is not meant to be a parallel data processor, or to change the way computation resources are used. Instead, it is meant to be a light weight tool for code organization in the form of DAG and for graph visualization that can be used on top of Dask or PySpark. 
 
@@ -30,12 +30,13 @@ Let's construct a simple computation graph: (Note the similarity of API to that 
 	a2 = G.add(adding)(3, a1)
 	a3 = G.add(adding)(a1, a2)
 
-At this point, no evaluation has occurred. Also, the outputs ``a1``, ``a2``, and ``a3`` are ``DataNode`` objects (well, more precisely, weak references to the ``DataNode`` objects)
-You can kick off the evaluation by invoking ``get`` method from any of the output objects:
+At this point, no evaluation has occurred. The outputs ``a1``, ``a2``, and ``a3`` are ``DataNode`` objects (well, more precisely, weak references to the ``DataNode`` objects)
 
-.. code:: python
+.. You can kick off the evaluation by invoking ``run`` method from any of the output objects:
 
-	print(a3.get())  # 11
+.. .. code:: python
+
+.. 	print(a3.get())  # 11
 
 You can also easily visualize the DAG using ``view`` method:
 
