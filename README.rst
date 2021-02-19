@@ -297,6 +297,15 @@ Pyflow will only execute parts of the graph that has data dependency. We can vis
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/dep.png
    :width: 10pt
 
+You can pass in several arguments, just as you can with ``run_only`` method for execution:
+
+.. code:: python
+
+	c_result = G.view_dependency('save_dataAB', c) 
+
+.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/dep2.png
+   :width: 10pt
+
 
 
 No output methods
