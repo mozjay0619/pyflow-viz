@@ -32,11 +32,11 @@ Let's construct a simple computation graph: (Note the similarity of API to that 
 
 At this point, no evaluation has occurred. The outputs ``a1``, ``a2``, and ``a3`` are ``DataNode`` objects (well, more precisely, weak references to the ``DataNode`` objects)
 
-.. You can kick off the evaluation by invoking ``run`` method from any of the output objects:
+You can execute the computation graph by invoking ``run`` method:
 
-.. .. code:: python
+.. code:: python
 
-.. 	print(a3.get())  # 11
+	G.run()
 
 You can also easily visualize the DAG using ``view`` method:
 
