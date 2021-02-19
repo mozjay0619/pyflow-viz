@@ -265,6 +265,12 @@ The ``run`` method will execute all nodes in the graph, but what if you just wan
 
 	G.view(gap=0.25)
 
+.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/for_partial1.png
+   :width: 10pt
+
+
+
+
 
 
 Visualizing computation dependency
