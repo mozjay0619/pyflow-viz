@@ -224,7 +224,7 @@ Finally, you can set the alias of the nodes by passing in ``method_alias`` and/o
 The default alias for operation node is the String name of the method being passed in, and the default alias for data node is simply "data". We do not include the example of setting ``method_alias`` to discourage its use. Setting method alias different from the method name will make look up of graph node in the code base very difficult. 
 
 
-Executing part of graph
+Executing parts of graph
 -----------------------
 
 The ``run`` method will execute all nodes in the graph, but what if you don't want to run every node in the graph to save yourself time? Let's look at an example:
