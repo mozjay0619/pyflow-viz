@@ -102,7 +102,14 @@ The ``view`` function actually has the ability to summarize the DAG by only show
 
 With the summary functionality turned off, the complete DAG visualization will includes ``DataNodes`` as well as the ``OperationNodes``. You may be wondering what the extra records with ``(1, )`` written inside are. They signal the data persistence. We will discuss what this is, and how this works, in greater detail later. 
 
+But that graph image is a little too big. We can shrink the gap between the nodes with handy the ``gap`` parameter:
 
+.. code:: python
+
+	G.view(summary=False, gap=0.2)  # the default value is 0.415
+
+.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/gapped_graph.png
+   :width: 17pt
 
 Styling your DAG
 ----------------
