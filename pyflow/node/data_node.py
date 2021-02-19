@@ -152,5 +152,6 @@ class DataNode(BaseNode):
         self.graph_dict[self.node_uid]['data_dim'] = ''
         
         del self.value_holder
-        self.value_holder = DataHolderNode(self.graph_uid, self.graph_alias, self.node_uid, None, self.verbose)
+
+        self.value_holder = DataHolderNode(self.graph_uid, self.graph_alias, self.node_uid, "__specialPFV__NoneData", self.verbose)
         
