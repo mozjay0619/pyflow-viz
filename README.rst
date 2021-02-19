@@ -223,6 +223,11 @@ Finally, you can set the alias of the nodes by passing in ``method_alias`` and/o
 
 The default alias for operation node is the String name of the method being passed in, and the default alias for data node is simply "data". We do not include the example of setting ``method_alias`` to discourage its use. Setting method alias different from the method name will make look up of graph node in the code base very difficult. 
 
+Visualizing computation dependency
+----------------------------------
+
+
+
 
 No output methods
 -----------------
@@ -283,6 +288,13 @@ Pyflow will create graph accordingly, such that the outputless operation node is
 
 
 This is a more realistic shape of the DAG in the actual use case of data preprocessing. Also, this is why ``run`` method makes more sense to use then ``get`` method in most realistic use cases. As you can see above, there is no data node from which we can call ``get`` method to retrieve the data. We are not interested in the data per se as we are in what we can do with the data. And most of the time, when we do something with our data, the end result is not another data. This does not mean you shouldn't use ``get``. There might be situations where you would want to get the data back, especially during interactive sessions. 
+
+
+
+
+
+
+
 
 
 Grafting graphs together
