@@ -44,15 +44,11 @@ def view_full(graph_dict, graph_attributes, verbose, current_graph_uid):
     
     ranks = set()
 
-
-
     for node_properties_dict in graph_dict.values():
         
         rank = get_rank(node_properties_dict)
         if rank is not None:
             ranks.add(rank)
-
-
 
     ranks = list(ranks)
     ranks.sort()

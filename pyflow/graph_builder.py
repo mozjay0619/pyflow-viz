@@ -355,10 +355,17 @@ class GraphBuilder():
 
     def run(self, *args):    
 
-        requested_data_node_uids = [elem().node_uid for elem in args]
+        str_node_uids = [elem for elem in args if isinstance(elem, str)] 
+        requested_str_nodes = [(k, v) for k, v in self.strong_ref_dict.items() if 
+        (k in str_node_uids) 
+        or ('_'.join(k.split('_')[0:-1]) in str_node_uids)]
         
-        requested_data_nodes = [(k, v) for k, v in self.strong_ref_dict.items() 
-                                     if v.node_uid in requested_data_node_uids]
+        requested_op_nodes = [requested_str_node for requested_str_node in requested_str_nodes if requested_str_node[1].node_type=='operation']
+
+        requested_data_nodes1 = [requested_str_node for requested_str_node in requested_str_nodes if requested_str_node[1].node_type=='data']
+        data_node_uids = [elem().node_uid for elem in args if isinstance(elem, ExtendedRef)]
+        requested_data_nodes2 = [(k, v) for k, v in self.strong_ref_dict.items() if k in data_node_uids]
+        requested_data_nodes = list(set(requested_data_nodes1 + requested_data_nodes2))
 
         for k, v in requested_data_nodes:
             v.shallowly_persist()
@@ -371,39 +378,99 @@ class GraphBuilder():
         for k, v in op_nodes:
             v.run()
         
-        if len(args) == 1:
-            return args[0].get()
+        if len(requested_data_nodes) == 1:
+            return requested_data_nodes[0][1].get()
         else:
-            return [arg.get() for arg in args]
+            return [requested_data_node[1].get() for requested_data_node in requested_data_nodes]
 
+    def view_dependency(self, *args, summary=True, verbose=False, gap=None):
 
+        if gap is not None:
+            graph_attributes = {'graph_ranksep': gap}
+            self.update_graph_attributes(graph_attributes)
 
-    def run_only(self, *args, view=False, summary=True):
+        if not verbose:
+            verbose = self.verbose
 
+        str_node_uids = [elem for elem in args if isinstance(elem, str)] 
+        requested_str_nodes = [(k, v) for k, v in self.strong_ref_dict.items() if 
+        (k in str_node_uids) 
+        or ('_'.join(k.split('_')[0:-1]) in str_node_uids)]
+
+        requested_op_nodes = [requested_str_node for requested_str_node in requested_str_nodes if requested_str_node[1].node_type=='operation']
+
+        requested_data_nodes1 = [requested_str_node for requested_str_node in requested_str_nodes if requested_str_node[1].node_type=='data']
         data_node_uids = [elem().node_uid for elem in args if isinstance(elem, ExtendedRef)]
-        requested_data_nodes = [(k, v) for k, v in self.strong_ref_dict.items() if k in data_node_uids]
+        requested_data_nodes2 = [(k, v) for k, v in self.strong_ref_dict.items() if k in data_node_uids]
+        requested_data_nodes = list(set(requested_data_nodes1 + requested_data_nodes2))
 
-        if view:
-
-            all_dependency_ancestor_node_uids = set()
-
-
+        all_dependency_ancestor_node_uids = set()
 
         for k, v in requested_data_nodes:
 
-            if view:
+            dependency_ancestor_node_weak_refs = v.get_all_dependency_ancestor_node_weak_refs()
+            dependency_ancestor_node_uids = [elem().node_uid for elem in dependency_ancestor_node_weak_refs if elem().graph_uid==self.graph_uid]
 
-                dependency_ancestor_node_weak_refs = v.get_all_dependency_ancestor_node_weak_refs()
-                dependency_ancestor_node_uids = [elem().node_uid for elem in dependency_ancestor_node_weak_refs if elem().graph_uid==self.graph_uid]
+            # without the last condition, the possible data_1 name from
+            # an external graph that is ancestor of the target data node
+            # will overlap with the data_1 of this current graph
+            # this will lead to highlighting of a data_1 from this graph
+            # even if that data_1 is not an ancestor
 
-                # without the last condition, the possible data_1 name from
-                # an external graph that is ancestor of the target data node
-                # will overlap with the data_1 of this current graph
-                # this will lead to highlighting of a data_1 from this graph
-                # even if that data_1 is not an ancestor
+            all_dependency_ancestor_node_uids.update(dependency_ancestor_node_uids)
+            all_dependency_ancestor_node_uids.update([k])
 
-                all_dependency_ancestor_node_uids.update(dependency_ancestor_node_uids)
-                all_dependency_ancestor_node_uids.update([k])
+        
+
+        for k, v in requested_op_nodes:
+
+            dependency_ancestor_node_weak_refs = v.get_all_dependency_ancestor_node_weak_refs()
+            dependency_ancestor_node_uids = [elem().node_uid for elem in dependency_ancestor_node_weak_refs]
+
+            all_dependency_ancestor_node_uids.update(dependency_ancestor_node_uids)
+            all_dependency_ancestor_node_uids.update([k])
+
+        graph_dict_copied = copy.deepcopy(self.graph_dict)
+
+        all_dependency_ancestor_node_uids = list(all_dependency_ancestor_node_uids)
+
+        for dependency_ancestor_node_uid in all_dependency_ancestor_node_uids:
+            
+            graph_dict_copied[dependency_ancestor_node_uid]['is_activated'] = True
+
+        preprocessed_graph_dict = preprocess_graph_dict(graph_dict_copied, self.graph_uid, self.graph_attributes, True)
+
+        if summary:
+            display(view_summary(preprocessed_graph_dict, self._graph_attributes(), verbose=verbose, current_graph_uid=self.graph_uid))
+        else:
+            display(view_full(preprocessed_graph_dict, self._graph_attributes(), verbose=verbose, current_graph_uid=self.graph_uid))
+
+    def run_only(self, *args, view_dependency=False, summary=True, verbose=False, gap=None):
+
+        if gap is not None:
+            graph_attributes = {'graph_ranksep': gap}
+            self.update_graph_attributes(graph_attributes)
+
+        str_node_uids = [elem for elem in args if isinstance(elem, str)] 
+        requested_str_nodes = [(k, v) for k, v in self.strong_ref_dict.items() if 
+        (k in str_node_uids) 
+        or ('_'.join(k.split('_')[0:-1]) in str_node_uids)]
+        
+        requested_op_nodes = [requested_str_node for requested_str_node in requested_str_nodes if requested_str_node[1].node_type=='operation']
+
+        requested_data_nodes1 = [requested_str_node for requested_str_node in requested_str_nodes if requested_str_node[1].node_type=='data']
+        data_node_uids = [elem().node_uid for elem in args if isinstance(elem, ExtendedRef)]
+        requested_data_nodes2 = [(k, v) for k, v in self.strong_ref_dict.items() if k in data_node_uids]
+        requested_data_nodes = list(set(requested_data_nodes1 + requested_data_nodes2))
+
+        if view_dependency:
+
+            if not verbose:
+                verbose = self.verbose
+
+            self.view_dependency(*args, summary=summary, verbose=verbose)
+            
+        for k, v in requested_data_nodes:
 
             if v.has_value():
                 continue
@@ -411,51 +478,18 @@ class GraphBuilder():
             v.shallowly_persist()
             v.activate_dependency_op_nodes()
 
-        op_node_uids = [elem for elem in args if isinstance(elem, str)] 
-        requested_op_nodes = [(k, v) for k, v in self.strong_ref_dict.items() if '_'.join(k.split('_')[0:-1]) in op_node_uids]
-
         for k, v in requested_op_nodes:
             v.activate_dependency_op_nodes()
-
-            if view:
-
-                dependency_ancestor_node_weak_refs = v.get_all_dependency_ancestor_node_weak_refs()
-                dependency_ancestor_node_uids = [elem().node_uid for elem in dependency_ancestor_node_weak_refs]
-
-                all_dependency_ancestor_node_uids.update(dependency_ancestor_node_uids)
-                all_dependency_ancestor_node_uids.update([k])
-
-        if view:
-
-            graph_dict_copied = copy.deepcopy(self.graph_dict)
-
-            all_dependency_ancestor_node_uids = list(all_dependency_ancestor_node_uids)
-
-            for dependency_ancestor_node_uid in all_dependency_ancestor_node_uids:
-                
-                graph_dict_copied[dependency_ancestor_node_uid]['is_activated'] = True
-
-            preprocessed_graph_dict = preprocess_graph_dict(graph_dict_copied, self.graph_uid, self.graph_attributes, True)
-
-            if summary :
-                display(view_summary(preprocessed_graph_dict, self._graph_attributes(), verbose=self.verbose, current_graph_uid=self.graph_uid))
-            else:
-                display(view_full(preprocessed_graph_dict, self._graph_attributes(), verbose=self.verbose, current_graph_uid=self.graph_uid))
-
 
         op_nodes = [(k, v) for k, v in self.strong_ref_dict.items() if v.node_type == 'operation' and v.is_activated()]
 
         for k, v in op_nodes:
             v.run()
 
-        data_args = [elem for elem in args if isinstance(elem, ExtendedRef)]
-
-        if len(data_args) == 1:
-            return data_args[0].get()
+        if len(requested_data_nodes) == 1:
+            return requested_data_nodes[0][1].get()
         else:
-            return [data_arg.get() for data_arg in data_args]
-
-
+            return [requested_data_node[1].get() for requested_data_node in requested_data_nodes]
 
     def remove(self, n=1):
 
@@ -540,7 +574,13 @@ class GraphBuilder():
 
         self.user_defined_graph_attributes = graph_attributes
 
-    def view(self, summary=True, graph_attributes=None):
+    def view(self, summary=True, graph_attributes=None, verbose=False, gap=None):
+
+        if gap is not None:
+            graph_attributes = {'graph_ranksep': gap}
+
+        if not verbose:
+            verbose = self.verbose
 
         if graph_attributes:  # need validity check here
             self.update_graph_attributes(graph_attributes)
@@ -548,9 +588,9 @@ class GraphBuilder():
         preprocessed_graph_dict = preprocess_graph_dict(self.graph_dict, self.graph_uid, self.graph_attributes, False)
         
         if summary:
-            return view_summary(preprocessed_graph_dict, self._graph_attributes(), verbose=self.verbose, current_graph_uid=self.graph_uid)
+            return view_summary(preprocessed_graph_dict, self._graph_attributes(), verbose=verbose, current_graph_uid=self.graph_uid)
         else:
-            return view_full(preprocessed_graph_dict, self._graph_attributes(), verbose=self.verbose, current_graph_uid=self.graph_uid)
+            return view_full(preprocessed_graph_dict, self._graph_attributes(), verbose=verbose, current_graph_uid=self.graph_uid)
 
     def save_view(self, summary=True, graph_attributes=None, dirpath=None, filename='digraph', fileformat='png'):
 
