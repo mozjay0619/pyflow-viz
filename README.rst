@@ -301,12 +301,19 @@ You can pass in several arguments, just as you can with ``run_only`` method for 
 
 .. code:: python
 
-	c_result = G.view_dependency('save_dataAB', c) 
+	G.view_dependency('save_dataAB', c) 
 
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/dep2.png
    :width: 10pt
 
+This method also supports other parameters of ``view`` method:
 
+.. code:: python
+
+	G.view_dependency('save_dataAB', c, summary=False, gap=0.2) 
+
+.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/dep3.png
+   :width: 10pt
 
 No output methods
 -----------------
