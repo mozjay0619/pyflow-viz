@@ -64,7 +64,7 @@ A couple notes:
 Multi-output methods
 --------------------
 
-What if we have a python function with multiple outputs? Due to dynamic nature of python, it is impossible to determine the number of outputs before the function is actually ran. In such a case, you need to specify the number of outputs by ``n_out`` argument:
+What if we have a python function with multiple outputs? Due to dynamic nature of python, it is impossible to determine the number of outputs before the function is actually ran. In such a case, you **must** to specify the number of outputs by ``n_out`` argument:
 
 .. code:: python
 
