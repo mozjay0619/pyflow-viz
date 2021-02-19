@@ -276,7 +276,7 @@ From the above graph, let's say you want to test the ``transform_dataA`` method.
 
 When you invoke the ``run_only`` method, Pyflow will only execute parts of the graph that has the data dependency to the asked node. 
 
-Now let's say you are testing the ``save_dataAB`` method. But this node does not have data node that we can use to pass into the ``run_only`` method. That's why you can also pass in the string of the node names into the ``run_only`` method:
+This time, let's say you are testing the ``save_dataAB`` method. But this node does not have data node that we can use to pass into the ``run_only`` method. That's why you can also pass in the string of the node names into the ``run_only`` method:
 
 .. code:: python
 
@@ -288,7 +288,14 @@ In the above code, only the result for ``a`` node is returned because ``save_dat
 Visualizing computation dependency
 ----------------------------------
 
-When asked to compute something, Pyflow will only execute parts of the graph that has data dependency. We can visualize this dependency with ``view_dependency`` method. 
+Pyflow will only execute parts of the graph that has data dependency. We can visualize this dependency with ``view_dependency`` method. We will use the same graph from the previous example:
+
+.. code:: python
+
+	G.view_dependency('save_dataAB') 
+
+.. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/dep.png
+   :width: 10pt
 
 
 
