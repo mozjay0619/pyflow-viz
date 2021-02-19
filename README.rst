@@ -42,13 +42,17 @@ You can easily visualize the resulting DAG using ``view`` method:
 
 The default setting of the ``view`` method will only visualize the operation nodes. But ``view`` can do much more, as we will learn shortly.
 
-You can execute the computation graph by invoking ``run`` method:
+You can execute the computation graph by invoking the ``run`` method:
 
 .. code:: python
 
-	G.run()
+	G.run()  # will run all the operation nodes
 
-You 
+You can pass in data nodes to get the desired results back this way:
+
+.. code:: python
+
+	a1_result, a3_result = G.run(a1, a3)  # will run all the operation nodes, and return the result data values of a1, a3
 
 
 
@@ -57,18 +61,6 @@ A couple notes:
 
 1. The API was inspired by that of the `Keras functional API <https://keras.io/getting-started/functional-api-guide/>`_
 2. For demo, we are using a simple method of adding two integers, but the input method can be any python function, including instance methods, with arbitrary inputs such as numpy array, pandas dataframe or Spark dataframe.
-3. Lastly, more often then not, you will execute the graph with ``run`` method instead of invoking ``get`` on the individual data nodes. ``run`` method will be discussed more in-depth once we understand how Pyflow manages computation and memory internally. For now, just note that you can kick off the graph this way as well, which is the preferred way:
-
-.. code:: python
-
-	G.run()  # will run all the operation nodes
-
-You can also pass in data nodes to get the results back this way:
-
-.. code:: python
-
-	a1_result, a3_result = G.run(a1, a3)  # will run all the operation nodes, and return the result data values of a1, a3
-
 
 Multi-output methods
 --------------------
