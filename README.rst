@@ -30,7 +30,15 @@ Let's construct a simple computation graph: (Note the similarity of API to that 
 	a2 = G.add(adding)(3, a1)
 	a3 = G.add(adding)(a1, a2)
 
-At this point, no evaluation has occurred. The outputs ``a1``, ``a2``, and ``a3`` are ``DataNode`` objects. The methods we just added are ``OperationNode`` objects of the graph.
+At this point, no evaluation has occurred. The outputs ``a1``, ``a2``, and ``a3`` are ``DataNode`` objects. The methods that we just added are ``OperationNode`` objects of the DAG.
+
+You can also easily visualize the DAG using ``view`` method:
+
+.. code:: python
+
+	G.view()
+
+.. figure:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/simple_dag.png
 
 You can execute the computation graph by invoking ``run`` method:
 
@@ -40,13 +48,7 @@ You can execute the computation graph by invoking ``run`` method:
 
 You 
 
-You can also easily visualize the DAG using ``view`` method:
 
-.. code:: python
-
-	G.view()
-
-.. figure:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/simple_dag.png
 
 
 A couple notes:
