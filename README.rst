@@ -64,7 +64,7 @@ A couple notes:
 Multi-output methods
 --------------------
 
-What if we have a python function with multiple outputs? Due to dynamic nature of python, it is impossible to determine the number of outputs before the function is actually ran. In such a case, you **must** specify the number of outputs by ``n_out`` argument:
+What if we have a python function with multiple outputs? Due to dynamic nature of python, it is impossible to determine the number of outputs before the function is actually ran. In such a case, you **must** specify the number of outputs by ``n_out`` argument. Otherwise, Pyflow will deem the output to be a single output whose value is a list of multiple elements. Here is an example of how to do use ``n_out`` parameter: 
 
 .. code:: python
 
