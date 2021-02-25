@@ -6,7 +6,7 @@ from ..utils import view_summary
 
 import warnings
 import copy
-from IPython.display import display
+# from IPython.display import display
 
 class DataNode(BaseNode):
     

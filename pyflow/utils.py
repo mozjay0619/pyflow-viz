@@ -6,8 +6,8 @@ import inspect
 import textwrap
 import sys
 
-from graphviz import Digraph
-import graphviz
+# from graphviz import Digraph
+# from graphviz import Source
 
 MAX_INTEGER = sys.maxsize 
 
@@ -41,6 +41,13 @@ def get_type(node_properties_dict):
     return node_type
 
 def view_full(graph_dict, graph_attributes, verbose, current_graph_uid):
+
+    try:
+        from graphviz import Digraph
+        from graphviz import Source
+    except ModuleNotFoundError:
+        print('To use visualization functionalities, please install graphviz:')
+        print('\npip3 install graphviz')
     
     ranks = set()
 
@@ -373,7 +380,7 @@ def save_graph_image(graph, dirpath=None, filename=None, fileformat=None):
         filepath = os.path.join(dirpath, filename)
 
 
-        graph = graphviz.Source(graph, format='png')
+        graph = Source(graph, format='png')
         filepath_ = graph.render(filepath)
         return filepath_
 

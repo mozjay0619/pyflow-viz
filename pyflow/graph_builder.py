@@ -13,7 +13,7 @@ from collections import defaultdict
 from collections import Iterable
 import sys
 import copy
-from IPython.display import display
+# from IPython.display import display
 
  
 MAX_INTEGER = sys.maxsize 
@@ -441,6 +441,9 @@ class GraphBuilder():
         preprocessed_graph_dict = preprocess_graph_dict(graph_dict_copied, self.graph_uid, self.graph_attributes, True)
 
         if summary:
+
+            return view_summary(preprocessed_graph_dict, self._graph_attributes(), verbose=verbose, current_graph_uid=self.graph_uid)
+
             display(view_summary(preprocessed_graph_dict, self._graph_attributes(), verbose=verbose, current_graph_uid=self.graph_uid))
         else:
             display(view_full(preprocessed_graph_dict, self._graph_attributes(), verbose=verbose, current_graph_uid=self.graph_uid))
