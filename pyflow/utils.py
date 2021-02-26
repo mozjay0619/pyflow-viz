@@ -5,6 +5,7 @@ import ast
 import inspect
 import textwrap
 import sys
+import warnings
 
 
 MAX_INTEGER = sys.maxsize 
@@ -422,3 +423,12 @@ def topological_sort(graph_dict):
         sorted_graph_dict[node_uid] = graph_dict[node_uid]
     
     return sorted_graph_dict
+
+def query_dict_with_partial_key(d, k):
+    return [(_k, _v) for _k, _v in d.items() if _k.startswith(k)]
+
+def format_Warning(message, category, filename, lineno, line=''):
+    return str(filename) + ':' + str(lineno) + ': ' + category.__name__ + ': ' +str(message) + '\n'
+
+class Ambiguous_Node_Name_Warning(UserWarning):
+    pass
