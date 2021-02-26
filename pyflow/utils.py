@@ -6,11 +6,8 @@ import inspect
 import textwrap
 import sys
 
-# from graphviz import Digraph
-# from graphviz import Source
 
 MAX_INTEGER = sys.maxsize 
-
 
 class ExtendedRef(weakref.ref):
 
@@ -47,7 +44,8 @@ def view_full(graph_dict, graph_attributes, verbose, current_graph_uid):
         from graphviz import Source
     except ModuleNotFoundError:
         print('To use visualization functionalities, please install graphviz:')
-        print('\npip3 install graphviz')
+        print('\npip install graphviz')
+        return
     
     ranks = set()
 

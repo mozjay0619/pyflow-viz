@@ -1,11 +1,3 @@
-from bokeh.io import output_notebook, show, output_file
-from bokeh.layouts import gridplot
-from bokeh.models.widgets import Div
-from bokeh.models.widgets import Paragraph
-from bokeh.models.widgets import PreText
-from bokeh.plotting import figure, show, output_file
-import bokeh
-
 import numpy as np
 import struct
 import imghdr
@@ -13,8 +5,7 @@ import base64
 import os
 
 from subprocess import check_call
-from scipy import optimize
-from skimage import io
+
 
 TMP_DIGRAPH_FILEPATH = 'digraph.png'
 TMP_GRAPH_RENDER_FILEPATH = 'pyflow_tmp'
@@ -197,7 +188,42 @@ def get_layout_elements(graph_obj, pixel_offset):
     return graph_alias, p, method_docstrs
 
 def document(*graph_objs, filename=None, pixel_offset=-1):
-    
+
+    need_bokeh = False
+    need_scipy = False
+    need_skimage = False
+
+    try:
+        from bokeh.io import output_notebook, show, output_file
+        from bokeh.layouts import gridplot
+        from bokeh.models.widgets import Div
+        from bokeh.models.widgets import Paragraph
+        from bokeh.models.widgets import PreText
+        from bokeh.plotting import figure, show, output_file
+        import bokeh
+    except ModuleNotFoundError:
+        need_bokeh = True
+
+    try:
+        from scipy import optimize
+    except ModuleNotFoundError:
+        need_scipy = True
+        
+    try:
+        from skimage import io
+    except ModuleNotFoundError:
+        need_skimage = True
+
+    if need_bokeh or need_scipy or need_skimage:
+        print('To use document functionalities, please install follwing package(s):')
+        if need_bokeh:
+            print('\npip install bokeh')
+        if need_scipy:
+            print('\npip install scipy')
+        if need_skimage:
+            print('\npip install scikit-image')
+        return
+
     filename = 'graphs_overview.html'
     graph_overview_header = Div(text="""<h2>Graphs Overview</h2>""", width=300, height=40)
     

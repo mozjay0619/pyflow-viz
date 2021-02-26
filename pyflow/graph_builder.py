@@ -13,7 +13,6 @@ from collections import defaultdict
 from collections import Iterable
 import sys
 import copy
-# from IPython.display import display
 
  
 MAX_INTEGER = sys.maxsize 
@@ -420,8 +419,6 @@ class GraphBuilder():
             all_dependency_ancestor_node_uids.update(dependency_ancestor_node_uids)
             all_dependency_ancestor_node_uids.update([k])
 
-        
-
         for k, v in requested_op_nodes:
 
             dependency_ancestor_node_weak_refs = v.get_all_dependency_ancestor_node_weak_refs()
@@ -444,9 +441,9 @@ class GraphBuilder():
 
             return view_summary(preprocessed_graph_dict, self._graph_attributes(), verbose=verbose, current_graph_uid=self.graph_uid)
 
-            display(view_summary(preprocessed_graph_dict, self._graph_attributes(), verbose=verbose, current_graph_uid=self.graph_uid))
         else:
-            display(view_full(preprocessed_graph_dict, self._graph_attributes(), verbose=verbose, current_graph_uid=self.graph_uid))
+            
+            return view_full(preprocessed_graph_dict, self._graph_attributes(), verbose=verbose, current_graph_uid=self.graph_uid)
 
     def run_only(self, *args, view_dependency=False, summary=True, verbose=False, gap=None):
 

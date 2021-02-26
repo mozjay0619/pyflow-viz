@@ -6,7 +6,6 @@ from ..utils import view_summary
 
 import warnings
 import copy
-# from IPython.display import display
 
 class DataNode(BaseNode):
     
@@ -82,18 +81,18 @@ class DataNode(BaseNode):
                              'persist_record_shape': 'True'}
 
         if summary :
-            display(view_summary(graph_dict_copied, _graph_attributes, verbose=self.verbose, current_graph_uid=self.graph_uid))
+            return view_summary(graph_dict_copied, _graph_attributes, verbose=self.verbose, current_graph_uid=self.graph_uid)
         else:
-            display(view_full(graph_dict_copied, _graph_attributes, verbose=self.verbose, current_graph_uid=self.graph_uid))
+            return view_full(graph_dict_copied, _graph_attributes, verbose=self.verbose, current_graph_uid=self.graph_uid)
 
-    def get(self, view=False, summary=True):
+    def get(self, view_dependency=False, summary=True):
 
         # this is to support the multi-graph paradigm
         self.remove_dead_child_nodes()
         
         if self.value_holder.has_value():
 
-            if view:
+            if view_dependency:
                 self.view_activated(summary)
                 
             if self.verbose:
@@ -119,7 +118,7 @@ class DataNode(BaseNode):
 
             self.activate_dependency_op_nodes()
             
-            if view:
+            if view_dependency:
 
                 self.view_activated(summary)
 
