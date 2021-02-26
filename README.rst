@@ -378,12 +378,6 @@ This method also supports other parameters of ``view`` method:
    :width: 10pt
 
 
-
-
-
-
-
-
 Grafting graphs together
 ------------------------
 
