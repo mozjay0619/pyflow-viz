@@ -353,7 +353,7 @@ class GraphBuilder():
             else:
                 return op_node_weak_ref().child_node_weak_refs[0]
 
-    def run(self, *args):    
+    def run(self, *args, summary=False):    
 
         str_node_uids = [elem for elem in args if isinstance(elem, str)] 
         requested_str_nodes = [(k, v) for k, v in self.strong_ref_dict.items() if 

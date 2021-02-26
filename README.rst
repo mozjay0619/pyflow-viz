@@ -287,7 +287,7 @@ This is a more realistic shape of the DAG in the actual use case of data preproc
 
 
 Executing parts of graph
------------------------
+------------------------
 
 The ``run`` method will execute all nodes in the graph, but what if you don't want to run every node in the graph to save yourself time? Let's look at an example:
 
