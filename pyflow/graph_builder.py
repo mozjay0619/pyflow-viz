@@ -7,12 +7,16 @@ from .utils import save_graph_image
 from .utils import contains_return_statement
 from .utils import topological_sort
 from .utils import preprocess_graph_dict
+from .utils import query_dict_with_partial_key
+from .utils import format_Warning
+from .utils import Ambiguous_Node_Name_Warning
 # from .utils import add_to_module_global_namespace
 
 from collections import defaultdict
 from collections import Iterable
 import sys
 import copy
+import warnings
 
  
 MAX_INTEGER = sys.maxsize 
@@ -354,17 +358,32 @@ class GraphBuilder():
 
     def run(self, *args, summary=False):    
 
-        str_node_uids = [elem for elem in args if isinstance(elem, str)] 
-        requested_str_nodes = [(k, v) for k, v in self.strong_ref_dict.items() if 
-        (k in str_node_uids) 
-        or ('_'.join(k.split('_')[0:-1]) in str_node_uids)]
-        
-        requested_op_nodes = [requested_str_node for requested_str_node in requested_str_nodes if requested_str_node[1].node_type=='operation']
+        requested_op_nodes = []
+        requested_data_nodes = []
 
-        requested_data_nodes1 = [requested_str_node for requested_str_node in requested_str_nodes if requested_str_node[1].node_type=='data']
-        data_node_uids = [elem().node_uid for elem in args if isinstance(elem, ExtendedRef)]
-        requested_data_nodes2 = [(k, v) for k, v in self.strong_ref_dict.items() if k in data_node_uids]
-        requested_data_nodes = list(set(requested_data_nodes1 + requested_data_nodes2))
+        for elem in args:
+            
+            if isinstance(elem, str):
+                
+                requested_node = query_dict_with_partial_key(self.strong_ref_dict, elem)
+
+            elif isinstance(elem, ExtendedRef):
+                
+                data_node_uid = elem().node_uid
+                requested_node = query_dict_with_partial_key(self.strong_ref_dict, data_node_uid)
+                
+            if len(requested_node) > 1:
+                node_uids = [k for k, v in requested_node]
+                warnings.warn('The requested output string "{output_str}" matches '
+                              'with more than 1 node uids: {node_uids}, only '
+                              'returning the first match: {first_match}.'.format(
+                              output_str=elem, node_uids=node_uids, first_match=node_uids[0]), 
+                              Ambiguous_Node_Name_Warning)
+                
+            if requested_node[0][1].node_type=='data':
+                requested_data_nodes.append(requested_node[0])
+            elif requested_node[0][1].node_type=='operation':
+                requested_op_nodes.append(requested_node[0])
 
         for k, v in requested_data_nodes:
             v.shallowly_persist()
@@ -451,17 +470,32 @@ class GraphBuilder():
             graph_attributes = {'graph_ranksep': gap}
             self.update_graph_attributes(graph_attributes)
 
-        str_node_uids = [elem for elem in args if isinstance(elem, str)] 
-        requested_str_nodes = [(k, v) for k, v in self.strong_ref_dict.items() if 
-        (k in str_node_uids) 
-        or ('_'.join(k.split('_')[0:-1]) in str_node_uids)]
-        
-        requested_op_nodes = [requested_str_node for requested_str_node in requested_str_nodes if requested_str_node[1].node_type=='operation']
+        requested_op_nodes = []
+        requested_data_nodes = []
 
-        requested_data_nodes1 = [requested_str_node for requested_str_node in requested_str_nodes if requested_str_node[1].node_type=='data']
-        data_node_uids = [elem().node_uid for elem in args if isinstance(elem, ExtendedRef)]
-        requested_data_nodes2 = [(k, v) for k, v in self.strong_ref_dict.items() if k in data_node_uids]
-        requested_data_nodes = list(set(requested_data_nodes1 + requested_data_nodes2))
+        for elem in args:
+            
+            if isinstance(elem, str):
+                
+                requested_node = query_dict_with_partial_key(self.strong_ref_dict, elem)
+
+            elif isinstance(elem, ExtendedRef):
+                
+                data_node_uid = elem().node_uid
+                requested_node = query_dict_with_partial_key(self.strong_ref_dict, data_node_uid)
+                
+            if len(requested_node) > 1:
+                node_uids = [k for k, v in requested_node]
+                warnings.warn('The requested output string "{output_str}" matches '
+                              'with more than 1 node uids: {node_uids}, only '
+                              'returning the first match: {first_match}.'.format(
+                              output_str=elem, node_uids=node_uids, first_match=node_uids[0]), 
+                              Ambiguous_Node_Name_Warning)
+                
+            if requested_node[0][1].node_type=='data':
+                requested_data_nodes.append(requested_node[0])
+            elif requested_node[0][1].node_type=='operation':
+                requested_op_nodes.append(requested_node[0])
 
         if view_dependency:
 

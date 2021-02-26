@@ -47,7 +47,6 @@ class OperationNode(BaseNode):
         for dependency_op_node_weak_ref in dependency_op_nodes_weak_refs:
             dependency_op_node_weak_ref().activate()
 
-        
     def run(self):
         """run method will do four things with respect to the current op node
         1. it will get values from the parent data node(s)
