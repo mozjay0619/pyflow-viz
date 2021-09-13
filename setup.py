@@ -8,7 +8,7 @@ import setuptools
 from setuptools.command.install import install
 
 # circleci.py version
-import pyflow
+from src import pyflow
 VERSION = f"v{pyflow.__version__}"
 
 def readme():
