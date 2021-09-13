@@ -42,7 +42,8 @@ setuptools.setup(
 	long_description_content_type="text/x-rst",
 	url="https://github.com/mozjay0619/pyflow-viz",
 	license="DSB 3-clause",
-	packages=setuptools.find_packages(),
+	package_dir={"": "src"},
+    packages=setuptools.find_packages(where="src"),
 	install_requires=["numpy>=1.18.2", "pandas>=0.25.3"],
 	python_requires='>=3',
     cmdclass={
