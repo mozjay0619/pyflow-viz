@@ -2,7 +2,7 @@
 
 |CICD| |VERSION| |LICENCE| |PythonVersion|
 
-.. |CICD| image:: image:: https://img.shields.io/circleci/build/github/mozjay0619/pyflow-viz?label=circleci&token=93f5878e444e751d779f2954eb5fce9bc9ab5b3e
+.. |CICD| image:: https://img.shields.io/circleci/build/github/mozjay0619/pyflow-viz?label=circleci&token=93f5878e444e751d779f2954eb5fce9bc9ab5b3e
 	:alt: CircleCI
 .. |LICENCE| image:: https://img.shields.io/pypi/l/pyflow-viz
 	:alt: PyPI - License
@@ -10,6 +10,9 @@
 	:alt: PyPI
 .. |PythonVersion| image:: https://img.shields.io/badge/python-3.6%20%7C%203.7%20%7C%203.8%20%7C%203.9-blue
 .. _PythonVersion: https://img.shields.io/badge/python-3.6%20%7C%203.7%20%7C%203.8%20%7C%203.9-blue
+
+
+
 
 
 Pyflow
