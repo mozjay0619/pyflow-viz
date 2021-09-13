@@ -23,4 +23,4 @@ package:
 	python setup.py bdist_wheel
 
 test:
-	coverage run -m pytest pyflow/tests/test_graph_builder.py
+	coverage run -m pytest tests/test_graph_builder.py
