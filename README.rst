@@ -85,7 +85,6 @@ What if we have a python function with multiple outputs? Due to dynamic nature o
 	G.view()
 
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/multi_output.png
-   :width: 17pt
 
 
 Visualizing data flow
@@ -98,7 +97,6 @@ The ``view`` function actually has the ability to summarize the DAG by only show
 	G.view(summary=False)
 
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/summary_false.png
-   :width: 17pt
 
 With the summary functionality turned off, the complete DAG visualization will includes ``DataNodes`` as well as the ``OperationNodes``. You may be wondering what the extra records with ``(1, )`` written inside are. They signal the data persistence. We will discuss what this is, and how this works, in greater detail later. 
 
@@ -109,7 +107,6 @@ But that graph image is a little too big. We can shrink the gap between the node
 	G.view(summary=False, gap=0.2)  # the default value is 0.415
 
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/gapped_graph.png
-   :width: 17pt
 
 Styling your DAG
 ----------------
@@ -146,7 +143,6 @@ Pyflow lets the user customize the DAG visuals to a certain degree, with more to
 	G.view()
 
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/queryingA.png
-   :width: 10pt
 
 But since at a conceptual level, queries are similarly progenitors of new data, perhaps we want to put them side by side on top, and position is controlled by ``rank`` parameter. Also, since these are probably coming from some data storage, we might want to style their nodes accordingly, with different color.
 
@@ -163,7 +159,6 @@ But since at a conceptual level, queries are similarly progenitors of new data, 
 	G.view()
 
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/queryingB.png
-   :width: 10pt
 
 
 But then we might want to make the DAG a little shorter, especially if we are to add more and more intermediate steps. We can control more detailed aesthetics with ``graph_attributes`` (the ``gap`` is simply the short cut parameter for this!):
@@ -175,7 +170,6 @@ But then we might want to make the DAG a little shorter, especially if we are to
 	G.view(graph_attributes=graph_attributes)
 
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/shortGraph.png
-   :width: 10pt
 
 You can take a look and play around with the rest of the configurations: 
 
@@ -218,7 +212,6 @@ Finally, you can set the alias of the nodes by passing in ``method_alias`` and/o
 	G.view(summary=False, graph_attributes=graph_attributes)
 
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/aliasingGraph.png
-   :width: 10pt
 
 
 The default alias for operation node is the String name of the method being passed in, and the default alias for data node is simply "data". We do not include the example of setting ``method_alias`` to discourage its use. Setting method alias different from the method name will make look up of graph node in the code base very difficult. 
@@ -279,7 +272,6 @@ Pyflow will create graph accordingly, such that the outputless operation node is
 
 
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/no_output_.png
-   :width: 10pt
 
 
 This is a more realistic shape of the DAG in the actual use case of data preprocessing. 
@@ -328,7 +320,6 @@ The ``run`` method will execute all nodes in the graph, but what if you don't wa
 	G.view(gap=0.25)
 
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/for_partial1.png
-   :width: 10pt
 
 From the above graph, let's say you want to test the ``transform_dataA`` method. For this purpose, you only need to run ``query_dataA`` and ``transform_dataA``. In such a case, you can use the ``run_only`` method, instead of ``run`` method, which will execute every node in the graph:
 
@@ -357,7 +348,6 @@ Pyflow will only execute parts of the graph that has data dependency. We can vis
 	G.view_dependency('save_dataAB') 
 
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/dep.png
-   :width: 10pt
 
 You can pass in several arguments, just as you can with ``run_only`` method for execution:
 
@@ -366,7 +356,6 @@ You can pass in several arguments, just as you can with ``run_only`` method for 
 	G.view_dependency('save_dataAB', c) 
 
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/dep2.png
-   :width: 10pt
 
 This method also supports other parameters of ``view`` method:
 
@@ -375,7 +364,6 @@ This method also supports other parameters of ``view`` method:
 	G.view_dependency('save_dataAB', c, summary=False, gap=0.2) 
 
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/dep3.png
-   :width: 10pt
 
 
 Grafting graphs together
@@ -398,7 +386,6 @@ When the computation graph becomes too big, the size of the visualized graph can
 	G.view()
 
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/graft1.png
-   :width: 10pt
 
 Let's look at the unsummarized version to take notice of the output_alias of the last data node:
 
@@ -408,7 +395,6 @@ Let's look at the unsummarized version to take notice of the output_alias of the
 	G.view(summary=False, graph_attributes={'graph_ranksep': 0.3})
 
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/graft2.png
-   :width: 10pt
 
 In the above code, we have created one graph. But we can create another graph, and graft the ``First Graph`` graph to the new graph:
 
@@ -423,7 +409,6 @@ In the above code, we have created one graph. But we can create another graph, a
 	H.view(summary=False)  # notice that the output_alias from previous graph is also preserved! 
 
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/graft3_.png
-   :width: 10pt
 
 As you can see, the previous graph is now summarized into a box. You can combine as many graphs in this way as you want. Despite this visual effect, ``b3`` is now part of one single big combined computation graph. Therefore, calling ``b3.get()`` will trigger computations in nodes that belong to both ``G`` and ``H`` as long as they are needed. As far as computation is concerned, you just have one big graph. 
 
@@ -494,7 +479,6 @@ Doing so will create a static HTML file that displays the DAG image as well as t
 This code will produce the following HTML file:
 
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/document.png
-   :width: 10pt
 
 
 Memory persistance with Pyflow
@@ -580,7 +564,6 @@ Also, when you persist certain nodes, this persistence request will manifest in 
 	G.view()
 
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/record1.png
-   :width: 10pt
 
 The empty box signifies that the graph is requested to persist that data, but it does not yet hold that data because it has not yet been executed. But once you run the graph, the empty record slot will be filled by the dimensionality of the resulting data. Currently it supports PySpark dataframe, numpy array, and pandas dataframe. All other data will have a default dimension of ``(1, )``. 
 
@@ -589,7 +572,6 @@ The empty box signifies that the graph is requested to persist that data, but it
 	G.run()
 
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/record2.png
-   :width: 10pt
 
 Now, of course, it is not the method that is being persisted but the resulting data of that op node. You can see this when you visualize the DAG with ``summary=False``:
 
@@ -598,7 +580,6 @@ Now, of course, it is not the method that is being persisted but the resulting d
 	G.run(summary=False)
 
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/record3.png
-   :width: 10pt
 
 Some notes:
 
@@ -659,7 +640,6 @@ With ``verbose=True``, along with the final output, pyflow will also produce the
 Let's take the tour of this process by looking at the graph. Notice that in verbose mode, the graph will actually print out the uid's of the nodes not just their aliases (more on setting alias later!)
 
 .. image:: https://github.com/mozjay0619/pyflow-viz/blob/master/media/verbose_.png
-   :width: 10pt
 
 As pyflow tries to compute ``data_12``, it will first activate all the ``OperationNodes`` that is needed for the computation, in our case, those are ``adding_11``, ``adding_8``, ``adding_0``, ``return2_4``. It will then follow the lineage of the graph to work on intermediate results needed to proceed down the graph. Notice that as the computation proceeds, the ``OperationNodes`` that were activated are deactivated. When it gets to ``data_3``, notice that it is needed at both ``adding_8`` and ``return2_4``. Thus, once it completes ``adding_8``, it cannot yet release the memory from ``data_3``: ``data_3 still needed at return2_4``. But as soon as ``return2_4`` is ran, it releases ``data_3`` from memory, as it is not needed anymore: ``data_3 released!``. The ``DataNodes`` with raw inputs such as integers are not released since there is no way for the graph to reconstruct them. 
 
