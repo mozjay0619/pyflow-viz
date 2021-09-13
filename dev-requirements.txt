@@ -1,2 +1,6 @@
+twine
+coverage
+pytest
+codecov
 pandas
 numpy
