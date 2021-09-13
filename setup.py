@@ -32,7 +32,7 @@ class VerifyVersionCommand(install):
 with open("README.rst", "r") as fh:
     long_description = fh.read()
 
-setup(
+setuptools.setup(
 	name="pyflow-viz", 
 	version=VERSION,
 	author="Jay Kim",
@@ -42,7 +42,7 @@ setup(
 	long_description_content_type="text/x-rst",
 	url="https://github.com/mozjay0619/pyflow-viz",
 	license="DSB 3-clause",
-	packages=find_packages(),
+	packages=setuptools.find_packages(),
 	install_requires=["numpy>=1.18.2", "pandas>=0.25.3"],
 	python_requires='>=3',
     cmdclass={
