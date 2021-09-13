@@ -19,7 +19,7 @@ class DataHolderNode(BaseNode):
         self.value = value
     
     def has_value(self):
-        return self.value is not "__specialPFV__NoneData"
+        return self.value != "__specialPFV__NoneData"
 
     def get_persisted_data_dim_as_str(self):
         """Currently supports dimensionality from:
