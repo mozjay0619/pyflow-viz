@@ -19,6 +19,7 @@ docs:
 	$(MAKE) -C docs html
 
 package:
+	pip3 install numpy as np
 	python setup.py sdist
 	python setup.py bdist_wheel
 
