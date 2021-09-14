@@ -12,14 +12,14 @@ clean:
 
 dev:
 	pip install --upgrade pip
-	pip install -r dev-requirements.txt
+	pip3 install -r dev-requirements.txt
 	pip install -e .
 
 docs:
 	$(MAKE) -C docs html
 
 package:
-	pip3 install numpy 
+	pip3 install -r dev-requirements.txt
 	python setup.py sdist
 	python setup.py bdist_wheel
 
